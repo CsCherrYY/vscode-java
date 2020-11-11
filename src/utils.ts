@@ -125,3 +125,9 @@ export async function waitForDocumentChangesToEnd(document: TextDocument): Promi
 		}, 400);
 	});
 }
+
+export namespace FormatterProFileConstants {
+	export const OPEN_CURRENT_PROFILE = "open current format profile";
+	export const IMPORT_FROM_REMOTE = "import eclipse format profile from remote URL";
+	export const IMPORT_FROM_LOCAL = "import eclipse format profile from local";
+}

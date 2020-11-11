@@ -4,14 +4,14 @@ import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration } from 'vscode';
+import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration, QuickPickItem, OpenDialogOptions } from 'vscode';
 import { ExecuteCommandParams, ExecuteCommandRequest, LanguageClient, LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, DidChangeConfigurationNotification, CancellationToken } from 'vscode-languageclient';
 import { collectJavaExtensions } from './plugin';
 import { prepareExecutable } from './javaServerStarter';
 import * as requirements from './requirements';
 import { Commands } from './commands';
 import { ExtensionAPI, ClientStatus } from './extension.api';
-import { getJavaConfiguration, deleteDirectory, getBuildFilePatterns, getInclusionPatternsFromNegatedExclusion, convertToGlob, getExclusionBlob } from './utils';
+import { getJavaConfiguration, deleteDirectory, getBuildFilePatterns, getInclusionPatternsFromNegatedExclusion, convertToGlob, getExclusionBlob, FormatterProFileConstants } from './utils';
 import { onConfigurationChange, getJavaServerMode, ServerMode } from './settings';
 import { logger, initializeLogFile } from './log';
 import glob = require('glob');
@@ -350,7 +350,7 @@ async function workspaceContainsBuildFiles(): Promise<boolean> {
 	const inclusionPatterns: string[] = getBuildFilePatterns();
 	const inclusionPatternsFromNegatedExclusion: string[] = getInclusionPatternsFromNegatedExclusion();
 	if (inclusionPatterns.length > 0 && inclusionPatternsFromNegatedExclusion.length > 0 &&
-			(await workspace.findFiles(convertToGlob(inclusionPatterns, inclusionPatternsFromNegatedExclusion), null, 1 /*maxResults*/)).length > 0) {
+		(await workspace.findFiles(convertToGlob(inclusionPatterns, inclusionPatternsFromNegatedExclusion), null, 1 /*maxResults*/)).length > 0) {
 		return true;
 	}
 
@@ -541,19 +541,54 @@ function openLogFile(logFile, openingFailureWarning: string, column: ViewColumn 
 }
 
 async function openFormatter(extensionPath) {
+	const candidates: QuickPickItem[] = [];
 	const defaultFormatter = path.join(extensionPath, 'formatters', 'eclipse-formatter.xml');
 	const formatterUrl: string = getJavaConfiguration().get('format.settings.url');
+	const global = workspace.workspaceFolders === undefined;
 	if (formatterUrl && formatterUrl.length > 0) {
-		if (isRemote(formatterUrl)) {
-			commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse(formatterUrl));
+		candidates.push({ label: FormatterProFileConstants.OPEN_CURRENT_PROFILE, description: formatterUrl });
+	}
+	candidates.push({ label: FormatterProFileConstants.IMPORT_FROM_REMOTE }, { label: FormatterProFileConstants.IMPORT_FROM_LOCAL });
+	const result = await window.showQuickPick(candidates);
+	if (result === undefined) {
+		return;
+	} else if (result.label === FormatterProFileConstants.OPEN_CURRENT_PROFILE) {
+		if (isRemote(result.description)) {
+			commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse(result.description));
 		} else {
-			const document = getPath(formatterUrl);
+			const document = getPath(result.description);
 			if (document && fs.existsSync(document)) {
 				return openDocument(extensionPath, document, defaultFormatter, null);
 			}
 		}
-	}
-	const global = workspace.workspaceFolders === undefined;
+	} else if (result.label === FormatterProFileConstants.IMPORT_FROM_REMOTE) {
+		const options: InputBoxOptions = {
+			prompt: 'please enter remote URL:',
+			ignoreFocusOut: true
+		};
+		const remoteUrl = await window.showInputBox(options);
+		if (remoteUrl && isRemote(remoteUrl)) {
+			commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse(remoteUrl));
+			getJavaConfiguration().update('format.settings.url', remoteUrl, global);
+		}
+	} else if (result.label === FormatterProFileConstants.IMPORT_FROM_LOCAL) {
+		const options: OpenDialogOptions = {
+			openLabel: "import",
+			canSelectFiles: true,
+			canSelectFolders: false,
+			canSelectMany: false,
+			defaultUri: global ? Uri.file(path.join(extensionPath, '..', 'redhat.java')) : workspace.workspaceFolders[0].uri,
+			filters: {
+				XML: ["xml"],
+			},
+		};
+		const localProfile: Uri[] = await window.showOpenDialog(options);
+		if (localProfile && localProfile[0]) {
+			getJavaConfiguration().update('format.settings.url', localProfile[0].fsPath, global);
+			openDocument(extensionPath, localProfile[0].fsPath, localProfile[0].fsPath, defaultFormatter);
+		}
+	} // TODO: Add template
+	/*
 	const fileName = formatterUrl || 'eclipse-formatter.xml';
 	let file;
 	let relativePath;
@@ -561,7 +596,7 @@ async function openFormatter(extensionPath) {
 		file = path.join(workspace.workspaceFolders[0].uri.fsPath, fileName);
 		relativePath = fileName;
 	} else {
-		const root = path.join(extensionPath, '..', 'redhat.java');
+		const root = ;
 		if (!fs.existsSync(root)) {
 			fs.mkdirSync(root);
 		}
@@ -576,7 +611,7 @@ async function openFormatter(extensionPath) {
 		} else {
 			addFormatter(extensionPath, file, defaultFormatter, relativePath);
 		}
-	}
+	}*/
 }
 
 function getPath(f) {
