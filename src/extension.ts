@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration, QuickPickItem, OpenDialogOptions } from 'vscode';
+import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration, QuickPickItem, OpenDialogOptions, QuickInputButtons, Disposable } from 'vscode';
 import { ExecuteCommandParams, ExecuteCommandRequest, LanguageClient, LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, DidChangeConfigurationNotification, CancellationToken } from 'vscode-languageclient';
 import { collectJavaExtensions } from './plugin';
 import { prepareExecutable } from './javaServerStarter';
@@ -546,72 +546,120 @@ async function openFormatter(extensionPath) {
 	const formatterUrl: string = getJavaConfiguration().get('format.settings.url');
 	const global = workspace.workspaceFolders === undefined;
 	if (formatterUrl && formatterUrl.length > 0) {
-		candidates.push({ label: FormatterProFileConstants.OPEN_CURRENT_PROFILE, description: formatterUrl });
+		const description: string = (formatterUrl === FormatterProFileConstants.VSCODE_SCHEME_URI) ? FormatterProFileConstants.VSCODE_SCHEME_INUSE : formatterUrl;
+		candidates.push({ label: FormatterProFileConstants.OPEN_CURRENT_SCHEME, description: description });
 	}
-	candidates.push({ label: FormatterProFileConstants.IMPORT_FROM_REMOTE }, { label: FormatterProFileConstants.IMPORT_FROM_LOCAL });
-	const result = await window.showQuickPick(candidates);
-	if (result === undefined) {
-		return;
-	} else if (result.label === FormatterProFileConstants.OPEN_CURRENT_PROFILE) {
-		if (isRemote(result.description)) {
-			commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse(result.description));
-		} else {
-			const document = getPath(result.description);
-			if (document && fs.existsSync(document)) {
-				return openDocument(extensionPath, document, defaultFormatter, null);
-			}
-		}
-	} else if (result.label === FormatterProFileConstants.IMPORT_FROM_REMOTE) {
-		const options: InputBoxOptions = {
-			prompt: 'please enter remote URL:',
-			ignoreFocusOut: true
-		};
-		const remoteUrl = await window.showInputBox(options);
-		if (remoteUrl && isRemote(remoteUrl)) {
-			commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse(remoteUrl));
-			getJavaConfiguration().update('format.settings.url', remoteUrl, global);
-		}
-	} else if (result.label === FormatterProFileConstants.IMPORT_FROM_LOCAL) {
-		const options: OpenDialogOptions = {
-			openLabel: "import",
-			canSelectFiles: true,
-			canSelectFolders: false,
-			canSelectMany: false,
-			defaultUri: global ? Uri.file(path.join(extensionPath, '..', 'redhat.java')) : workspace.workspaceFolders[0].uri,
-			filters: {
-				XML: ["xml"],
-			},
-		};
-		const localProfile: Uri[] = await window.showOpenDialog(options);
-		if (localProfile && localProfile[0]) {
-			getJavaConfiguration().update('format.settings.url', localProfile[0].fsPath, global);
-			openDocument(extensionPath, localProfile[0].fsPath, localProfile[0].fsPath, defaultFormatter);
-		}
-	} // TODO: Add template
-	/*
-	const fileName = formatterUrl || 'eclipse-formatter.xml';
-	let file;
-	let relativePath;
-	if (!global) {
-		file = path.join(workspace.workspaceFolders[0].uri.fsPath, fileName);
-		relativePath = fileName;
-	} else {
-		const root = ;
-		if (!fs.existsSync(root)) {
-			fs.mkdirSync(root);
-		}
-		file = path.join(root, fileName);
+	if (formatterUrl !== FormatterProFileConstants.VSCODE_SCHEME_URI) {
+		candidates.push({ label: FormatterProFileConstants.USE_VSCODE_SCHEME });
 	}
-	if (!fs.existsSync(file)) {
-		addFormatter(extensionPath, file, defaultFormatter, relativePath);
-	} else {
-		if (formatterUrl) {
-			getJavaConfiguration().update('format.settings.url', (relativePath !== null ? relativePath : file), global);
-			openDocument(extensionPath, file, file, defaultFormatter);
-		} else {
-			addFormatter(extensionPath, file, defaultFormatter, relativePath);
+	candidates.push({ label: FormatterProFileConstants.IMPORT_ECLIPSE_PROFILE });
+	const disposables: Disposable[] = [];
+	const pickBox = window.createQuickPick<QuickPickItem>();
+	pickBox.title = "Java formatter: Select formatter scheme";
+	pickBox.placeholder = "Select formatter scheme";
+	pickBox.items = candidates;
+	pickBox.ignoreFocusOut = true;
+	try {
+		await new Promise(async (resolve, reject) => {
+			disposables.push(
+				pickBox.onDidAccept(async () => {
+					if (!pickBox.selectedItems[0]) {
+						return;
+					}
+					resolve();
+					const result: QuickPickItem = pickBox.selectedItems[0];
+					if (result === undefined) {
+						return;
+					} else if (result.label === FormatterProFileConstants.OPEN_CURRENT_SCHEME) {
+						if (result.description === FormatterProFileConstants.VSCODE_SCHEME_INUSE) {
+							commands.executeCommand('workbench.action.openSettings', "java.formatter");  // TODO
+						} else if (isRemote(result.description)) {
+							commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse(result.description));
+						} else {
+							const document = getPath(result.description);
+							if (document && fs.existsSync(document)) {
+								return openDocument(extensionPath, document, defaultFormatter, null);
+							}
+						}
+					} else if (result.label === FormatterProFileConstants.IMPORT_ECLIPSE_PROFILE) {
+						const importSources: QuickPickItem[] = [{ label: FormatterProFileConstants.IMPORT_FROM_LOCAL }, { label: FormatterProFileConstants.IMPORT_FROM_REMOTE }];
+						const disposables: Disposable[] = [];
+						const pickBox = window.createQuickPick<QuickPickItem>();
+						pickBox.title = "Java formatter: Select eclipse profile source";
+						pickBox.items = importSources;
+						pickBox.placeholder = "Select profile source";
+						pickBox.ignoreFocusOut = true;
+						pickBox.buttons = [(QuickInputButtons.Back)];
+						try {
+							await new Promise(async (resolve, reject) => {
+								disposables.push(pickBox.onDidAccept(async () => {
+									if (!pickBox.selectedItems[0]) {
+										return;
+									}
+									resolve();
+									const result: QuickPickItem = pickBox.selectedItems[0];
+									if (result.label === FormatterProFileConstants.IMPORT_FROM_REMOTE) {
+										const options: InputBoxOptions = {
+											prompt: 'please enter remote URL:',
+											ignoreFocusOut: true
+										};
+										const remoteUrl = await window.showInputBox(options);
+										if (remoteUrl && isRemote(remoteUrl)) {
+											commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse(remoteUrl));
+											getJavaConfiguration().update('format.settings.url', remoteUrl, global);
+										}
+									} else if (result.label === FormatterProFileConstants.IMPORT_FROM_LOCAL) {
+										const options: OpenDialogOptions = {
+											openLabel: "import",
+											canSelectFiles: true,
+											canSelectFolders: false,
+											canSelectMany: false,
+											defaultUri: global ? Uri.file(path.join(extensionPath, '..', 'redhat.java')) : workspace.workspaceFolders[0].uri,
+											filters: {
+												XML: ["xml"],
+											},
+										};
+										const localProfile: Uri[] = await window.showOpenDialog(options);
+										if (localProfile && localProfile[0]) {
+											getJavaConfiguration().update('format.settings.url', localProfile[0].fsPath, global);
+											openDocument(extensionPath, localProfile[0].fsPath, localProfile[0].fsPath, defaultFormatter);
+										}
+									}
+								}),
+								pickBox.onDidTriggerButton((item) => {
+									if (item === QuickInputButtons.Back) {
+										openFormatter(extensionPath);
+										return resolve();
+									}
+								}),
+								pickBox.onDidHide(() => {
+									return resolve();
+								}));
+								disposables.push(pickBox);
+								pickBox.show();
+							});
+						} finally {
+							for (const d of disposables) {
+								d.dispose();
+							}
+						}
+					} else if (result.label === FormatterProFileConstants.USE_VSCODE_SCHEME) {
+						commands.executeCommand('workbench.action.openSettings', "java.formatter");  // TODO
+						getJavaConfiguration().update('format.settings.url', FormatterProFileConstants.VSCODE_SCHEME_URI, global);
+					}
+				}),
+				pickBox.onDidHide(() => {
+					return resolve();
+				})
+			);
+			disposables.push(pickBox);
+			pickBox.show();
+		});
+	} finally {
+		for (const d of disposables) {
+			d.dispose();
 		}
-	}*/
+	}
 }
 
 function getPath(f) {
