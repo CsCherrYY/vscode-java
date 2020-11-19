@@ -555,7 +555,7 @@ async function openFormatter(extensionPath) {
 	candidates.push({ label: FormatterProFileConstants.IMPORT_ECLIPSE_PROFILE });
 	const disposables: Disposable[] = [];
 	const pickBox = window.createQuickPick<QuickPickItem>();
-	pickBox.title = "Java formatter: Select formatter scheme";
+	pickBox.title = "Java formatter: Choose formatter scheme";
 	pickBox.placeholder = "Select formatter scheme";
 	pickBox.items = candidates;
 	pickBox.ignoreFocusOut = true;
@@ -585,7 +585,7 @@ async function openFormatter(extensionPath) {
 						const importSources: QuickPickItem[] = [{ label: FormatterProFileConstants.IMPORT_FROM_LOCAL }, { label: FormatterProFileConstants.IMPORT_FROM_REMOTE }];
 						const disposables: Disposable[] = [];
 						const pickBox = window.createQuickPick<QuickPickItem>();
-						pickBox.title = "Java formatter: Select eclipse profile source";
+						pickBox.title = "Java formatter: Choose eclipse profile source";
 						pickBox.items = importSources;
 						pickBox.placeholder = "Select profile source";
 						pickBox.ignoreFocusOut = true;
