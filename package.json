@@ -430,6 +430,152 @@
           "default": true,
           "scope": "window"
         },
+        "java.format.whitespace.before.comma": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace before a comma.",
+          "default": false,
+          "scope": "window"
+        },
+        "java.format.whitespace.before.binaryOperators": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace before a binary operator.",
+          "default": true,
+          "scope": "window"
+        },
+        "java.format.whitespace.before.openingBrace": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace before an opening brace.",
+          "default": true,
+          "scope": "window"
+        },
+        "java.format.whitespace.before.openingParenthesis.declarations": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace before an opening parenthesis in declarations.",
+          "default": false,
+          "scope": "window"
+        },
+        "java.format.whitespace.before.openingParenthesis.expressions": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace before an opening parenthesis in expressions.",
+          "default": false,
+          "scope": "window"
+        },
+        "java.format.whitespace.before.openingParenthesis.controlStatement": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace before an opening parenthesis in control statement.",
+          "default": true,
+          "scope": "window"
+        },
+        "java.format.whitespace.before.closingParenthesis": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace before a closing parenthesis.",
+          "default": false,
+          "scope": "window"
+        },
+        "java.format.whitespace.after.comma": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace after a comma.",
+          "default": true,
+          "scope": "window"
+        },
+        "java.format.whitespace.after.binaryOperators": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace after a binary operator.",
+          "default": true,
+          "scope": "window"
+        },
+        "java.format.whitespace.after.openingParenthesis": {
+          "type": "boolean",
+          "description": "Enable/disable inserting a whitespace after an opening parenthesis.",
+          "default": false,
+          "scope": "window"
+        },
+        "java.format.newline.brace": {
+          "type": "string",
+          "description": "Decides how to put the braces towards the content.",
+          "enum": [
+            "same line",
+            "next line"
+          ],
+          "enumDescriptions": [
+            "The Java formatter will put the braces in the same line of the content.",
+            "The Java formatter will put the braces in the next line of the content."
+          ],
+          "default": "same line",
+          "scope": "window"
+        },
+        "java.format.newline.eof": {
+          "type": "boolean",
+          "description": "Enable/disable inserting an empty line at the end of file if not exists.",
+          "default": true,
+          "scope": "window"
+        },
+        "java.format.newline.controlStatement": {
+          "type": "boolean",
+          "markdownDescription": "Enable/disable inserting an empty [test](command:java.view.package.exportJar) line in the following control statements:  before `else` in an `if` statement, before `catch` or `finally` in a `try` statement, before `while` in a `do` statement.",
+          "default": false,
+          "scope": "window"
+        },
+        "java.format.newline.controlStatement.keepSimple": {
+          "type": "boolean",
+          "markdownDescription": "Enable/disable keeping a simple control statement in the same line. **Note**: A simple control statement has only one item in its block.",
+          "default": false,
+          "scope": "window"
+        },
+        "java.format.newline.bracedCode": {
+          "type": "string",
+          "description": "Decides when to keep the braced code on one line.",
+          "enum": [
+            "Never",
+            "If empty",
+            "If at most one item",
+            "Preserve state"
+          ],
+          "enumDescriptions": [
+            "The Java formatter will never keep the braced code on one line.",
+            "If the block is empty, the Java formatter will keep the braced code on one line.",
+            "If the block has at most one item, the Java formatter will keep the braced code on one line.",
+            "The Java formatter will preserve the original state."
+          ],
+          "default": "Never",
+          "scope": "window"
+        },
+        "java.format.lineWrapping.length": {
+          "type": "number",
+          "description": "Controls the length of a line in the java file. Once a line exceeds this limit, the wrap policy will be adopted when formatting this line.",
+          "default": 120,
+          "scope": "window"
+        },
+        "java.format.comments.length": {
+          "type": "number",
+          "description": "Controls the length of a comment in the java file. Once a comment exceeds this limit, wrap policy will be adopted in formatting this comment.",
+          "default": 80,
+          "scope": "window"
+        },
+        "java.format.comments.OffOnTag": {
+          "type": "boolean",
+          "markdownDescription": "Enable/disable the off tag `\"@formatter:off\"` and the on tag `\"@formatter:on\"`. They can be used in any comments to turn the formatter off and on in a source file.",
+          "default": false,
+          "scope": "window"
+        },
+        "java.format.comments.javadoc.alignment": {
+          "type": "string",
+          "description": "Decides the policy of alignment in Javadoc.",
+          "enum": [
+            "Align names and descriptions",
+            "Align descriptions, grouped by type",
+            "Align descriptions to tag width",
+            "Don’t align"
+          ],
+          "enumDescriptions": [
+            "The Java formatter will align both the names and descriptions.",
+            "The Java formatter will group tags by type first, then align descriptions in a group.",
+            "The Java formatter will align descriptions according to the tag width.",
+            "The Java formatter will never align tags."
+          ],
+          "default": "Align descriptions, grouped by type",
+          "scope": "window"
+        },
         "java.codeGeneration.hashCodeEquals.useJava7Objects": {
           "type": "boolean",
           "description": "Use Objects.hash and Objects.equals when generating the hashCode and equals methods. This setting only applies to Java 7 and higher.",

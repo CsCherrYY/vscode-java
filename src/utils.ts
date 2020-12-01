@@ -125,3 +125,13 @@ export async function waitForDocumentChangesToEnd(document: TextDocument): Promi
 		}, 400);
 	});
 }
+
+export namespace FormatterProFileConstants {
+	export const OPEN_CURRENT_SCHEME = "Open current format scheme";
+	export const USE_VSCODE_SCHEME = "Use VS Code Java formatter";
+	export const IMPORT_ECLIPSE_PROFILE = "Import existing eclipse formatter profile...";
+	export const IMPORT_FROM_REMOTE = "Import eclipse formatter profile from remote URL";
+	export const IMPORT_FROM_LOCAL = "Import eclipse formatter profile from local file";
+	export const VSCODE_SCHEME_URI = "settings.json";
+	export const VSCODE_SCHEME_INUSE = "VS Code Java formatter";
+}
