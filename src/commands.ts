@@ -95,9 +95,13 @@ export namespace Commands {
     export const OPEN_LOGS = 'java.open.logs';
 
     /**
-     * Open Java formatter settings
+     * Import Java formatter settings from eclipse profile
      */
-    export const OPEN_FORMATTER = 'java.open.formatter.settings';
+    export const IMPORT_ECLIPSE_PROFILE = 'java.formatter.import.eclipse';
+    /**
+     * Import Java formatter settings from eclipse profile
+     */
+    export const OPEN_FORMATTER_SETTINGS = 'java.formatter.opensettings';
     /**
      * Clean the Java language server workspace
      */

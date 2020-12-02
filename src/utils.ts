@@ -126,7 +126,7 @@ export async function waitForDocumentChangesToEnd(document: TextDocument): Promi
 	});
 }
 
-export namespace FormatterProFileConstants {
+export namespace FormatterConstants {
 	export const OPEN_CURRENT_SCHEME = "Open current format scheme";
 	export const USE_VSCODE_SCHEME = "Use VS Code Java formatter";
 	export const IMPORT_ECLIPSE_PROFILE = "Import existing eclipse formatter profile...";

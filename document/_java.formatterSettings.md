@@ -11,13 +11,13 @@
   - [Control statement](#control-statement)
   - [Keep simple](#keep-simple)
 - [Whitespace](#whitespace)
-  - [Before binary operators](#before-binary-operators)
-  - [After binary operators](#after-binary-operators)
+  - [Before binary operator](#before-binary-operator)
+  - [After binary operator](#after-binary-operator)
   - [Before comma](#before-comma)
   - [After comma](#after-comma)
   - [Before closing parenthesis](#before-closing-parenthesis)
-  - [Before opening parenthesis in control statement](#before-opening-parenthesis-control-statement)
-  - [Before opening parenthesis in declarations](#before-opening-parenthesis-declarations)
+  - [Before opening parenthesis in control statement](#before-opening-parenthesis-in-control-statement)
+  - [Before opening parenthesis in declarations](#before-opening-parenthesis-in-declarations)
   - [After opening parenthesis](#after-opening-parenthesis)
   - [Before opening brace](#before-opening-brace)
 
@@ -299,7 +299,7 @@ void foo2(){
 ```
 ---
 ## Whitespace
-### Before binary operators
+### Before binary operator
 Enable/disable inserting a whitespace **before** a **binary operator**. The default value is `true`.
 
 #### Example code
@@ -318,8 +318,8 @@ int b = 3 + 4;
 int a = 1+2;
 int a = 3+ 4;
 ```
-> Also see: [After binary operators](#after-binary-operators)
-### After binary operators
+> Also see: [After binary operator](#after-binary-operator)
+### After binary operator
 Enable/disable inserting a whitespace **after** a **binary operator**. The default value is `true`.
 
 #### Example code
@@ -338,7 +338,7 @@ int b = 3 + 4;
 int a = 1+2;
 int a = 3 +4;
 ```
-> Also see: [Before binary operators](#before-binary-operators)
+> Also see: [Before binary operator](#before-binary-operator)
 ### Before comma
 Enable/disable inserting a whitespace **before** a **comma**. The default value is `false`.
 
@@ -409,7 +409,14 @@ void bar(int x) {
 ```
 > Also see: [Before opening parenthesis in control statement](#before-opening-parenthesis-control-statement), [Before opening parenthesis in declarations](#before-opening-parenthesis-declarations), [After opening parenthesis](#after-opening-parenthesis)
 ### Before opening parenthesis in control statement
-Enable/disable inserting a whitespace **before** an **opening parenthesis in control statement**. The default value is `true`.
+Enable/disable inserting a whitespace **before** an **opening parenthesis in control statement**. The default value is `true`. It will affect the following control statements:
+  - `if` statement
+  - `for` loop
+  - `switch` statement
+  - `while` and `do while` loop
+  - `synchronized` statement
+  - `try-with-resources` statement
+  - `catch` statement
 
 #### Example code
 ```java

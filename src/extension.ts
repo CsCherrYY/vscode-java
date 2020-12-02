@@ -4,14 +4,14 @@ import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration } from 'vscode';
+import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration, QuickPickItem, Disposable, QuickInputButtons, OpenDialogOptions, QuickPickOptions } from 'vscode';
 import { ExecuteCommandParams, ExecuteCommandRequest, LanguageClient, LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, DidChangeConfigurationNotification, CancellationToken } from 'vscode-languageclient';
 import { collectJavaExtensions } from './plugin';
 import { prepareExecutable } from './javaServerStarter';
 import * as requirements from './requirements';
 import { Commands } from './commands';
 import { ExtensionAPI, ClientStatus } from './extension.api';
-import { getJavaConfiguration, deleteDirectory, getBuildFilePatterns, getInclusionPatternsFromNegatedExclusion, convertToGlob, getExclusionBlob } from './utils';
+import { getJavaConfiguration, deleteDirectory, getBuildFilePatterns, getInclusionPatternsFromNegatedExclusion, convertToGlob, getExclusionBlob, FormatterConstants } from './utils';
 import { onConfigurationChange, getJavaServerMode, ServerMode } from './settings';
 import { logger, initializeLogFile } from './log';
 import glob = require('glob');
@@ -258,7 +258,9 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 
 			context.subscriptions.push(commands.registerCommand(Commands.OPEN_LOGS, () => openLogs()));
 
-			context.subscriptions.push(commands.registerCommand(Commands.OPEN_FORMATTER, async () => openFormatter(context.extensionPath)));
+			context.subscriptions.push(commands.registerCommand(Commands.IMPORT_ECLIPSE_PROFILE, async () => openFormatter(context.extensionPath)));
+
+			context.subscriptions.push(commands.registerCommand(Commands.OPEN_FORMATTER_SETTINGS, async () => openFormatterSettings()));
 
 			context.subscriptions.push(commands.registerCommand(Commands.CLEAN_WORKSPACE, () => cleanWorkspace(workspacePath)));
 
@@ -351,7 +353,7 @@ async function workspaceContainsBuildFiles(): Promise<boolean> {
 	const inclusionPatterns: string[] = getBuildFilePatterns();
 	const inclusionPatternsFromNegatedExclusion: string[] = getInclusionPatternsFromNegatedExclusion();
 	if (inclusionPatterns.length > 0 && inclusionPatternsFromNegatedExclusion.length > 0 &&
-			(await workspace.findFiles(convertToGlob(inclusionPatterns, inclusionPatternsFromNegatedExclusion), null, 1 /*maxResults*/)).length > 0) {
+		(await workspace.findFiles(convertToGlob(inclusionPatterns, inclusionPatternsFromNegatedExclusion), null, 1 /*maxResults*/)).length > 0) {
 		return true;
 	}
 
@@ -541,7 +543,67 @@ function openLogFile(logFile, openingFailureWarning: string, column: ViewColumn 
 		});
 }
 
-async function openFormatter(extensionPath) {
+async function openFormatter(extensionPath): Promise<void> {
+	const importSources: QuickPickItem[] = [{ label: FormatterConstants.IMPORT_FROM_LOCAL }, { label: FormatterConstants.IMPORT_FROM_REMOTE }];
+	const options: QuickPickOptions = {
+		placeHolder: "Select profile source",
+	};
+	const result = await window.showQuickPick(importSources, options);
+	if (result === undefined) {
+		return;
+	}
+	if (result.label === FormatterConstants.IMPORT_FROM_REMOTE) {
+		const disposables: Disposable[] = [];
+		const inputBox = window.createInputBox();
+		inputBox.title = "Java formatter: Import settings from remote URL";
+		inputBox.buttons = [(QuickInputButtons.Back)];
+		inputBox.ignoreFocusOut = true;
+		inputBox.placeholder = "Please enter remote URL:";
+		try {
+			await new Promise((async (resolve, reject) => {
+				disposables.push(inputBox.onDidAccept(async () => {
+					if (inputBox.value) {
+						if (isRemote(inputBox.value)) {
+							commands.executeCommand(Commands.OPEN_BROWSER, Uri.parse(inputBox.value));
+						} else {
+							return reject();
+						}
+					}
+				}));
+				disposables.push(inputBox.onDidHide(() => {
+					return reject();
+				}));
+				disposables.push(inputBox);
+				disposables.push(inputBox.onDidTriggerButton((button) => {
+					if (button === QuickInputButtons.Back) {
+						openFormatter(extensionPath);
+						return resolve();
+					}
+				}));
+				inputBox.show();
+			}));
+		} finally {
+			for (const d of disposables) {
+				d.dispose();
+			}
+		}
+	} else if (result.label === FormatterConstants.IMPORT_FROM_LOCAL) {
+		const options: OpenDialogOptions = {
+			openLabel: "import",
+			canSelectFiles: true,
+			canSelectFolders: false,
+			canSelectMany: false,
+			defaultUri: global ? Uri.file(path.join(extensionPath, '..', 'redhat.java')) : workspace.workspaceFolders[0].uri,
+			filters: {
+				XML: ["xml"],
+			},
+		};
+		const localProfile: Uri[] = await window.showOpenDialog(options);
+		if (localProfile && localProfile[0]) {
+			openDocument(extensionPath, localProfile[0].fsPath, localProfile[0].fsPath, undefined);
+		}
+	}
+	/*const global = workspace.workspaceFolders === undefined;
 	const defaultFormatter = path.join(extensionPath, 'formatters', 'eclipse-formatter.xml');
 	const formatterUrl: string = getJavaConfiguration().get('format.settings.url');
 	if (formatterUrl && formatterUrl.length > 0) {
@@ -554,7 +616,6 @@ async function openFormatter(extensionPath) {
 			}
 		}
 	}
-	const global = workspace.workspaceFolders === undefined;
 	const fileName = formatterUrl || 'eclipse-formatter.xml';
 	let file;
 	let relativePath;
@@ -577,7 +638,11 @@ async function openFormatter(extensionPath) {
 		} else {
 			addFormatter(extensionPath, file, defaultFormatter, relativePath);
 		}
-	}
+	}*/
+}
+
+function openFormatterSettings() {
+	commands.executeCommand('workbench.action.openSettings', "java.format");
 }
 
 function getPath(f) {
