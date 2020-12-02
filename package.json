@@ -454,12 +454,6 @@
           "default": false,
           "scope": "window"
         },
-        "java.format.whitespace.before.openingParenthesis.expressions": {
-          "type": "boolean",
-          "description": "Enable/disable inserting a whitespace before an opening parenthesis in expressions.",
-          "default": false,
-          "scope": "window"
-        },
         "java.format.whitespace.before.openingParenthesis.controlStatement": {
           "type": "boolean",
           "description": "Enable/disable inserting a whitespace before an opening parenthesis in control statement.",
@@ -490,18 +484,18 @@
           "default": false,
           "scope": "window"
         },
-        "java.format.newline.brace": {
+        "java.format.newline.bracePolicy": {
           "type": "string",
-          "description": "Decides how to put the braces towards the content.",
+          "description": "Decides where to put the opening brace toward the code.",
           "enum": [
-            "same line",
-            "next line"
+            "Same line",
+            "Next line"
           ],
           "enumDescriptions": [
-            "The Java formatter will put the braces in the same line of the content.",
-            "The Java formatter will put the braces in the next line of the content."
+            "The Java formatter will put the opening brace in the same line as the code.",
+            "The Java formatter will put the opening brace in the next line of the code."
           ],
-          "default": "same line",
+          "default": "Same line",
           "scope": "window"
         },
         "java.format.newline.eof": {
@@ -512,43 +506,41 @@
         },
         "java.format.newline.controlStatement": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting an empty [test](command:java.view.package.exportJar) line in the following control statements:  before `else` in an `if` statement, before `catch` or `finally` in a `try` statement, before `while` in a `do` statement.",
+          "markdownDescription": "Enable/disable inserting an empty line in control statements.[test](command:_java.formatterSettings?%5B%22before-binary-operators%22%5D)",
           "default": false,
           "scope": "window"
         },
         "java.format.newline.controlStatement.keepSimple": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable keeping a simple control statement in the same line. **Note**: A simple control statement has only one item in its block.",
+          "markdownDescription": "Enable/disable keeping a simple control statement in the same line.",
           "default": false,
           "scope": "window"
         },
         "java.format.newline.bracedCode": {
           "type": "string",
-          "description": "Decides when to keep the braced code on one line.",
+          "description": "Decides when the format will keep the braced code on one line.",
           "enum": [
             "Never",
             "If empty",
-            "If at most one item",
-            "Preserve state"
+            "If at most one item"
           ],
           "enumDescriptions": [
             "The Java formatter will never keep the braced code on one line.",
             "If the block is empty, the Java formatter will keep the braced code on one line.",
-            "If the block has at most one item, the Java formatter will keep the braced code on one line.",
-            "The Java formatter will preserve the original state."
+            "If the block has at most one item, the Java formatter will keep the braced code on one line."
           ],
           "default": "Never",
           "scope": "window"
         },
         "java.format.lineWrapping.length": {
           "type": "number",
-          "description": "Controls the length of a line in the java file. Once a line exceeds this limit, the wrap policy will be adopted when formatting this line.",
+          "description": "Controls the length of a line in the java file. Once a line exceeds this limit, the Java formatter will wrap this line when formatting.",
           "default": 120,
           "scope": "window"
         },
         "java.format.comments.length": {
           "type": "number",
-          "description": "Controls the length of a comment in the java file. Once a comment exceeds this limit, wrap policy will be adopted in formatting this comment.",
+          "description": "Controls the length of a comment in the java file. Once a comment exceeds this limit, the Java formatter will wrap this comment when formatting.",
           "default": 80,
           "scope": "window"
         },

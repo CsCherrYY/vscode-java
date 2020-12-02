@@ -357,6 +357,9 @@ export class StandardLanguageClient {
 				const sectionId: string = javaRefactorKinds.get(kind) || '';
 				markdownPreviewProvider.show(context.asAbsolutePath(path.join('document', `${Commands.LEARN_MORE_ABOUT_REFACTORING}.md`)), 'Java Refactoring', sectionId, context);
 			}));
+			context.subscriptions.push(commands.registerCommand(Commands.FORMATTER_EXAMPLES, async (title: string) => {
+				markdownPreviewProvider.show(context.asAbsolutePath(path.join('document', `${Commands.FORMATTER_EXAMPLES}.md`)), 'Java Formatter Settings', title, context);
+			}));
 		});
 	}
 

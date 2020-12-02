@@ -220,4 +220,6 @@ export namespace Commands {
     export const TEMPLATE_VARIABLES = '_java.templateVariables';
 
     export const RUNTIME_VALIDATION_OPEN = 'java.runtimeValidation.open';
+
+    export const FORMATTER_EXAMPLES = '_java.formatterSettings';
 }
