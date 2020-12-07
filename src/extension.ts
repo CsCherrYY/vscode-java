@@ -546,7 +546,7 @@ function openLogFile(logFile, openingFailureWarning: string, column: ViewColumn 
 async function openFormatter(extensionPath): Promise<void> {
 	const importSources: QuickPickItem[] = [{ label: FormatterConstants.IMPORT_FROM_LOCAL }, { label: FormatterConstants.IMPORT_FROM_REMOTE }];
 	const options: QuickPickOptions = {
-		placeHolder: "Select profile source",
+		placeHolder: "Select the location of your eclipse formatter profile",
 	};
 	const result = await window.showQuickPick(importSources, options);
 	if (result === undefined) {
@@ -642,7 +642,7 @@ async function openFormatter(extensionPath): Promise<void> {
 }
 
 function openFormatterSettings() {
-	commands.executeCommand('workbench.action.openSettings', "java.format");
+	commands.executeCommand('workbench.action.openSettings', "@ext:redhat.java java.format");
 }
 
 function getPath(f) {
