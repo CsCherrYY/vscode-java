@@ -406,6 +406,18 @@
           "default": true,
           "scope": "window"
         },
+        "java.format.settings.url": {
+          "type": "string",
+          "markdownDescription": "Specifies the url or file path to the [Eclipse formatter xml settings](https://github.com/redhat-developer/vscode-java/wiki/Formatter-settings).",
+          "default": null,
+          "scope": "window"
+        },
+        "java.format.settings.profile": {
+          "type": "string",
+          "markdownDescription": "Optional formatter profile name from the Eclipse formatter settings.",
+          "default": null,
+          "scope": "window"
+        },
         "java.format.comments.enabled": {
           "type": "boolean",
           "description": "Includes the comments during code formatting.",
@@ -418,61 +430,61 @@
           "default": true,
           "scope": "window"
         },
-        "java.format.whitespace.before.comma": {
+        "java.format.insertSpace.before.comma": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [before a comma](command:_java.formatterSettings?%5B%22before-comma%22%5D).",
+          "markdownDescription": "Inserts a whitespace [before a comma](command:_java.formatterSettings?%5B%22before-comma%22%5D).",
           "default": false,
           "scope": "window"
         },
-        "java.format.whitespace.before.binaryOperator": {
+        "java.format.insertSpace.before.binaryOperator": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [before a binary operator](command:_java.formatterSettings?%5B%22before-binary-operator%22%5D).",
+          "markdownDescription": "Inserts a whitespace [before a binary operator](command:_java.formatterSettings?%5B%22before-binary-operator%22%5D).",
           "default": true,
           "scope": "window"
         },
-        "java.format.whitespace.before.openingBrace": {
+        "java.format.insertSpace.before.openingBrace": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [before an opening brace](command:_java.formatterSettings?%5B%22before-opening-brace%22%5D).",
+          "markdownDescription": "Inserts a whitespace [before an opening brace](command:_java.formatterSettings?%5B%22before-opening-brace%22%5D).",
           "default": true,
           "scope": "window"
         },
-        "java.format.whitespace.before.openingParenthesis.declarations": {
+        "java.format.insertSpace.before.openingParenthesis.declarations": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [before an opening parenthesis in declarations](command:_java.formatterSettings?%5B%22before-opening-parenthesis-in-declarations%22%5D).",
+          "markdownDescription": "Inserts a whitespace [before an opening parenthesis in declarations](command:_java.formatterSettings?%5B%22before-opening-parenthesis-in-declarations%22%5D).",
           "default": false,
           "scope": "window"
         },
-        "java.format.whitespace.before.openingParenthesis.controlStatement": {
+        "java.format.insertSpace.before.openingParenthesis.controlStatement": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [before an opening parenthesis in control statement](command:_java.formatterSettings?%5B%22before-opening-parenthesis-in-control-statement%22%5D).",
+          "markdownDescription": "Inserts a whitespace [before an opening parenthesis in control statement](command:_java.formatterSettings?%5B%22before-opening-parenthesis-in-control-statement%22%5D).",
           "default": true,
           "scope": "window"
         },
-        "java.format.whitespace.before.closingParenthesis": {
+        "java.format.insertSpace.before.closingParenthesis": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [before a closing parenthesis](command:_java.formatterSettings?%5B%22before-closing-parenthesis%22%5D).",
+          "markdownDescription": "Inserts a whitespace [before a closing parenthesis](command:_java.formatterSettings?%5B%22before-closing-parenthesis%22%5D).",
           "default": false,
           "scope": "window"
         },
-        "java.format.whitespace.after.comma": {
+        "java.format.insertSpace.after.comma": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [after a comma](command:_java.formatterSettings?%5B%22after-comma%22%5D).",
+          "markdownDescription": "Inserts a whitespace [after a comma](command:_java.formatterSettings?%5B%22after-comma%22%5D).",
           "default": true,
           "scope": "window"
         },
-        "java.format.whitespace.after.binaryOperator": {
+        "java.format.insertSpace.after.binaryOperator": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [after a binary operator](command:_java.formatterSettings?%5B%22after-binary-operator%22%5D).",
+          "markdownDescription": "Inserts a whitespace [after a binary operator](command:_java.formatterSettings?%5B%22after-binary-operator%22%5D).",
           "default": true,
           "scope": "window"
         },
-        "java.format.whitespace.after.openingParenthesis": {
+        "java.format.insertSpace.after.openingParenthesis": {
           "type": "boolean",
-          "markdownDescription": "Enable/disable inserting a whitespace [after an opening parenthesis](command:_java.formatterSettings?%5B%22after-opening-parenthesis%22%5D).",
+          "markdownDescription": "Inserts a whitespace [after an opening parenthesis](command:_java.formatterSettings?%5B%22after-opening-parenthesis%22%5D).",
           "default": false,
           "scope": "window"
         },
-        "java.format.newline.bracePolicy": {
+        "java.format.insertLine.brace": {
           "type": "string",
           "markdownDescription": "Decides where to put the opening brace toward the code. See examples [here](command:_java.formatterSettings?%5B%22brace-policy%22%5D).",
           "enum": [
@@ -486,19 +498,19 @@
           "default": "Same line",
           "scope": "window"
         },
-        "java.format.newline.controlStatement": {
+        "java.format.insertLine.controlStatement": {
           "type": "boolean",
           "markdownDescription": "Enable/disable inserting an empty line in [control statements](command:_java.formatterSettings?%5B%22control-statement%22%5D).",
           "default": false,
           "scope": "window"
         },
-        "java.format.newline.controlStatement.keepSimple": {
+        "java.format.insertLine.controlStatement.keepSimple": {
           "type": "boolean",
           "markdownDescription": "Enable/disable keeping a [simple control statement](command:_java.formatterSettings?%5B%22keep-simple%22%5D) in the same line.",
           "default": false,
           "scope": "window"
         },
-        "java.format.newline.bracedCode": {
+        "java.format.insertLine.bracedCode": {
           "type": "string",
           "markdownDescription": "Decides when the format will keep the braced code on one line. See examples [here](command:_java.formatterSettings?%5B%22braced-code%22%5D).",
           "enum": [
@@ -514,7 +526,7 @@
           "default": "Never",
           "scope": "window"
         },
-        "java.format.lineWrapping.wrapLineLength": {
+        "java.format.wrapLineLength": {
           "type": "number",
           "markdownDescription": "Controls the length of a line in the java file. Once a line exceeds this limit, the Java formatter will wrap this line when formatting.",
           "default": 120,
