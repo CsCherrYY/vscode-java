@@ -98,10 +98,11 @@ export namespace Commands {
      * Import Java formatter settings from eclipse profile
      */
     export const IMPORT_ECLIPSE_PROFILE = 'java.formatter.import.eclipse';
-    /**
-     * Import Java formatter settings from eclipse profile
-     */
-    export const OPEN_FORMATTER_SETTINGS = 'java.formatter.opensettings';
+
+    export const OPEN_FORMATTER_SETTINGS = 'java.formatter.openSettings';
+
+    export const LOAD_SETTINGS_PRESET = 'java.formatter.loadPreset';
+
     /**
      * Clean the Java language server workspace
      */

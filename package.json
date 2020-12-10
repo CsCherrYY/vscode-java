@@ -854,13 +854,18 @@
         "category": "Java"
       },
       {
-        "command": "java.formatter.opensettings",
+        "command": "java.formatter.openSettings",
         "title": "Open Java Formatter Settings",
         "category": "Java"
       },
       {
         "command": "java.formatter.import.eclipse",
         "title": "Import Formatter Settings from Eclipse Profile",
+        "category": "Java"
+      },
+      {
+        "command": "java.formatter.loadPreset",
+        "title": "Load VS Code Java formatter settings preset",
         "category": "Java"
       },
       {

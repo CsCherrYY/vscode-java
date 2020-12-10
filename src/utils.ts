@@ -127,11 +127,9 @@ export async function waitForDocumentChangesToEnd(document: TextDocument): Promi
 }
 
 export namespace FormatterConstants {
-	export const OPEN_CURRENT_SCHEME = "Open current format scheme";
-	export const USE_VSCODE_SCHEME = "Use VS Code Java formatter";
-	export const IMPORT_ECLIPSE_PROFILE = "Import existing eclipse formatter profile...";
-	export const IMPORT_FROM_REMOTE = "From Remote URL";
-	export const IMPORT_FROM_LOCAL = "From Local File";
-	export const VSCODE_SCHEME_URI = "settings.json";
-	export const VSCODE_SCHEME_INUSE = "VS Code Java formatter";
+	export const IMPORT_FROM_REMOTE = "Import settings from remote URL";
+	export const IMPORT_FROM_LOCAL = "Import settings from Local File";
+	export const GOOGLE_PRESET = "Google Java Style preset";
+	export const ECLIPSE_PRESET = "Eclipse built-in preset";
+	export const JAVA_CONVENTION_PRESET = "Java Convention preset";
 }
