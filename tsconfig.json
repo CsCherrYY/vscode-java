@@ -2,13 +2,15 @@
 	"compilerOptions": {
 		"target": "es6",
 		"lib": [
-            "es6"
+			"es6",
+			"dom",
         ],
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"outDir": "out",
 		"sourceMap": true,
-		"plugins": [{ "name": "typescript-tslint-plugin" }]
+		"plugins": [{ "name": "typescript-tslint-plugin" }],
+		"jsx": "react"
 	},
 	"exclude": [
 		"node_modules",

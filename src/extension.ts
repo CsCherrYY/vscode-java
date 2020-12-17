@@ -25,6 +25,7 @@ import { runtimeStatusBarProvider } from './runtimeStatusBarProvider';
 import { registerSemanticTokensProvider } from './semanticTokenProvider';
 import { serverStatusBarProvider } from './serverStatusBarProvider';
 import { markdownPreviewProvider } from "./markdownPreviewProvider";
+import { JavaFormatterSettingsEditorProvider } from './javaFormatterSettingsEditorProvider';
 
 const syntaxClient: SyntaxLanguageClient = new SyntaxLanguageClient();
 const standardClient: StandardLanguageClient = new StandardLanguageClient();
@@ -267,6 +268,21 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 			context.subscriptions.push(commands.registerCommand(Commands.CLEAN_WORKSPACE, () => cleanWorkspace(workspacePath)));
 
 			context.subscriptions.push(onConfigurationChange());
+
+			const provider = new JavaFormatterSettingsEditorProvider(context);
+
+			context.subscriptions.push(window.registerCustomEditorProvider(JavaFormatterSettingsEditorProvider.viewType, provider));
+
+			context.subscriptions.push(commands.registerCommand("java.formatter.openSettingsWeb", async () => {
+				const panel = window.createWebviewPanel(
+					'vscjava.javaFormatterSettings',
+					'Java Formatter Settings',
+					ViewColumn.One,
+					{}
+				);
+				const document: TextDocument = await workspace.openTextDocument(context.asAbsolutePath("./formatter/assets/index.html"));
+				provider.resolveCustomTextEditor(document, panel, undefined);
+			}));
 
 			/**
 			 * Command to switch the server mode. Currently it only supports switch from lightweight to standard.
@@ -562,7 +578,7 @@ async function openFormatter(extensionPath): Promise<void> {
 		inputBox.ignoreFocusOut = true;
 		inputBox.placeholder = "Please enter remote URL:";
 		try {
-			await new Promise((async (resolve, reject) => {
+			await new Promise<void>((async (resolve, reject) => {
 				disposables.push(inputBox.onDidAccept(async () => {
 					if (inputBox.value) {
 						if (isRemote(inputBox.value)) {

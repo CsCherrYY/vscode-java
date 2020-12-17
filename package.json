@@ -864,6 +864,11 @@
         "category": "Java"
       },
       {
+        "command": "java.formatter.openSettingsWeb",
+        "title": "Open Java Formatter Settings configuration",
+        "category": "Java"
+      },
+      {
         "command": "java.formatter.loadPreset",
         "title": "Load VS Code Java formatter settings preset",
         "category": "Java"
@@ -998,7 +1003,18 @@
           "when": "java:serverMode == LightWeight"
         }
       ]
-    }
+    },
+    "customEditors": [
+      {
+        "viewType": "vscjava.javaFormatterSettings",
+        "displayName": "Java Formatter Settings",
+        "selector": [
+          {
+            "filenamePattern": "*.vscjava"
+          }
+        ]
+      }
+    ]
   },
   "resolutions": {
     "minimist": "^1.2.5",
@@ -1021,6 +1037,8 @@
     "@types/lodash.findindex": "^4.6.6",
     "@types/mocha": "^5.2.5",
     "@types/node": "^8.10.51",
+    "@types/react": "^16.9.49",
+    "@types/react-dom": "^16.9.8",
     "@types/vscode": "^1.47.0",
     "@types/winreg": "^1.2.30",
     "@types/winston": "^2.4.4",
@@ -1029,8 +1047,11 @@
     "gulp-download": "0.0.1",
     "lodash.findindex": "^4.6.0",
     "lodash.template": ">=4.5.0",
+    "jquery": "^3.5.1",
     "minimist": ">=1.2.5",
     "mocha": "^8.1.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
     "ts-loader": "^5.3.1",
     "tslint": "^5.11.0",
     "typescript": "^3.7.3",
