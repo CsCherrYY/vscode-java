@@ -50,7 +50,6 @@ suite('Java Language Extension - Standard', () => {
 				Commands.LIST_SOURCEPATHS,
 				Commands.NAVIGATE_TO_SUPER_IMPLEMENTATION_COMMAND,
 				Commands.OPEN_CLIENT_LOG,
-				Commands.OPEN_FORMATTER,
 				Commands.OPEN_JSON_SETTINGS,
 				Commands.OPEN_LOGS,
 				Commands.OPEN_OUTPUT,

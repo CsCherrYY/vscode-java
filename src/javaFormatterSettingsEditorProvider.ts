@@ -1,7 +1,7 @@
 'use strict';
 
 import { CancellationToken, CustomTextEditorProvider, ExtensionContext, TextDocument, WebviewPanel, workspace } from "vscode";
-import { loadTextFromFile } from "../formatter/utils";
+import { loadTextFromFile } from "./formatter/utils";
 
 export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProvider {
 
@@ -15,7 +15,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 		webviewPanel.webview.options = {
 			enableScripts: true,
 		};
-		const resourceUri = this.context.asAbsolutePath("./formatter/assets/index.html");
+		const resourceUri = this.context.asAbsolutePath("./dist/assets/formatter/index.html");
 		webviewPanel.webview.html = await loadTextFromFile(resourceUri);
 
 		function updateWebview() {

@@ -1,6 +1,6 @@
-
-import { loadTextFromFile } from "./utils";
 import * as vscode from "vscode";
+import { Commands } from "../commands";
+import { loadTextFromFile } from "./utils";
 
 let formatterSettingsView: vscode.WebviewPanel | undefined;
 
@@ -25,6 +25,7 @@ export async function formatterSettingsCmdHandler(context: vscode.ExtensionConte
         break;
       }
       case "export": {
+        vscode.commands.executeCommand(Commands.IMPORT_ECLIPSE_PROFILE);
         break;
       }
       default:

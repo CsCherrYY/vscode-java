@@ -280,7 +280,7 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 					ViewColumn.One,
 					{}
 				);
-				const document: TextDocument = await workspace.openTextDocument(context.asAbsolutePath("./formatter/assets/index.html"));
+				const document: TextDocument = await workspace.openTextDocument(context.asAbsolutePath("./dist/assets/formatter/index.html"));
 				provider.resolveCustomTextEditor(document, panel, undefined);
 			}));
 

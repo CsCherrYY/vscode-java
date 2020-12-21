@@ -2,7 +2,7 @@ import "bootstrap/js/src/tab";
 import * as $ from "jquery";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import "../../assets/vscode.scss";
+import "../css/vscode.scss";
 import { JavaFormatterSetting } from ".";
 import { CommentSettingsPanel } from "./java.formatter.comment";
 import { NewLineSettingsPanel } from "./java.formatter.newline";
@@ -10,19 +10,28 @@ import { exportSettings } from "./vscode.api";
 import { WhitespaceSettingsPanel } from "./java.formatter.whitespace";
 
 interface JavaFormatterPanelProps {
-  whitespaceSettings?: JavaFormatterSetting[];
-  commentSettings?: JavaFormatterSetting[];
-  newLineSettings?: JavaFormatterSetting[];
+  whitespaceSettings?: JavaFormatterSetting;
+  commentSettings?: JavaFormatterSetting;
+  newLineSettings?: JavaFormatterSetting;
 }
 
 export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps> {
 
   constructor(props) {
-    super(props);
+	super(props);
+	this.state = {
+		filterValue: "",
+	};
   }
 
   exp = () => {
     exportSettings();
+  }
+
+  handleChange(e) {
+	  this.setState({
+		  filterValue: e.target.value
+	  });
   }
 
   render = () => {
@@ -34,7 +43,15 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps>
     return (
       <div>
         <div className="row">
-          <div className="col-lg-12">
+          <div className="col-3">
+            <div className="input-group mb-3">
+              <div className="input-group-prepend">
+                <span className="input-group-text">Filter:</span>
+              </div>
+              <input type="text" className="form-control" placeholder="Search Settings..." onChange={this.handleChange.bind(this)}></input>
+            </div>
+          </div>
+          <div className="col-9">
             <button id="btnExport" className="btn btn-primary mr-2 float-right" title="Export Settings" onClick={this.exp}>Export</button>
             <button id="btnImport" className="btn btn-primary mr-2 float-right" title="Import Settings from eclipse Java formatter settings profile">Import from Profile...</button>
           </div>

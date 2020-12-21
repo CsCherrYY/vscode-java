@@ -18,7 +18,6 @@ suite('Java Language Extension - LightWeight', () => {
 				Commands.OPEN_SERVER_LOG,
 				Commands.OPEN_CLIENT_LOG,
 				Commands.OPEN_LOGS,
-				Commands.OPEN_FORMATTER,
 				Commands.CLEAN_WORKSPACE,
 				Commands.SWITCH_SERVER_MODE,
 			].sort();
