@@ -8,32 +8,25 @@ import { JavaFormatterSetting } from ".";
 import { CodePreviewPanel } from "./java.formatter.code";
 import { generateSettings } from "./utils";
 
-export interface CommentSettingsProps {
-  commentSettings?: JavaFormatterSetting[];
+export interface WrappingSettingsProps {
+  wrappingSettings?: JavaFormatterSetting[];
 }
 
-export class CommentSettingsPanel extends React.Component<CommentSettingsProps> {
+export class WrappingSettingsPanel extends React.Component<WrappingSettingsProps> {
 
-  constructor(props: CommentSettingsProps) {
+  constructor(props: WrappingSettingsProps) {
     super(props);
   }
 
-  private test: string = "\t/**\n\t * Descriptions of parameters and return values\n\
-  \t * are best appended at end of the javadoc\n\
-  \t * comment.\n\
-  \t * @param first  The first parameter. For an\n\
-  \t * optimum result, this should be an odd\n\
-  \t * number between 0 and 100.\n\
-  \t */\n\
-  \t int foo(int first, int second)\n\t \tthrows Exception;";
+  private test: string = "class MyClass \{int a = 0,b = 1,c = 2,d = 3;\}";
 
   render() {
     return (
       <div className="col">
         <div className="row">
           <div className="col-6">
-            <h2 className="font-weight-light">Comment</h2>
-            {generateSettings(this.props.commentSettings)}
+            <h2 className="font-weight-light">Wrapping</h2>
+            {generateSettings(this.props.wrappingSettings)}
           </div>
           <div className="col-6">
             <h2 className="font-weight-light">Preview</h2>

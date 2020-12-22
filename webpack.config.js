@@ -4,6 +4,7 @@
 //@ts-check
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
+const nodeExternals = require('webpack-node-externals');
 const path = require('path');
 
 module.exports = function (env, argv) {

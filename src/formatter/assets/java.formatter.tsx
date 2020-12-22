@@ -5,23 +5,23 @@ import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
 import { JavaFormatterSetting } from ".";
 import { CommentSettingsPanel } from "./java.formatter.comment";
-import { NewLineSettingsPanel } from "./java.formatter.newline";
+import { WrappingSettingsPanel } from "./java.formatter.wrapping";
 import { exportSettings } from "./vscode.api";
 import { WhitespaceSettingsPanel } from "./java.formatter.whitespace";
 
 interface JavaFormatterPanelProps {
-  whitespaceSettings?: JavaFormatterSetting;
-  commentSettings?: JavaFormatterSetting;
-  newLineSettings?: JavaFormatterSetting;
+  whitespaceSettings?: JavaFormatterSetting[];
+  commentSettings?: JavaFormatterSetting[];
+  wrappingSettings?: JavaFormatterSetting[];
 }
 
 export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps> {
 
   constructor(props) {
-	super(props);
-	this.state = {
-		filterValue: "",
-	};
+    super(props);
+    this.state = {
+      filterValue: "",
+    };
   }
 
   exp = () => {
@@ -29,16 +29,16 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps>
   }
 
   handleChange(e) {
-	  this.setState({
-		  filterValue: e.target.value
-	  });
+    this.setState({
+      filterValue: e.target.value
+    });
   }
 
   render = () => {
 
     const whitespaceSettingsPanel = React.createElement(WhitespaceSettingsPanel, this.props);
     const commentSettingsPanel = React.createElement(CommentSettingsPanel, this.props);
-    const newLineSettingsPanel = React.createElement(NewLineSettingsPanel, this.props);
+    const wrappingSettingsPanel = React.createElement(WrappingSettingsPanel, this.props);
 
     return (
       <div>
@@ -68,8 +68,8 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps>
                   role="tab" aria-controls="comment-panel" aria-selected="false" title="">Comment</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" id="newline-tab" data-toggle="tab" href="#newline-panel"
-                  role="tab" aria-controls="newline-panel" aria-selected="false" title="">NewLine</a>
+                <a className="nav-link" id="wrapping-tab" data-toggle="tab" href="#wrapping-panel"
+                  role="tab" aria-controls="wrapping-panel" aria-selected="false" title="">Wrapping</a>
               </li>
             </ul>
           </div>
@@ -89,10 +89,10 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps>
                   {commentSettingsPanel}
                 </div>
               </div>
-              <div className="tab-pane fade" id="newline-panel" role="tabpanel"
-                aria-labelledby="newline-tab">
-                <div className="row" id="newLineSettingsPanel">
-                  {newLineSettingsPanel}
+              <div className="tab-pane fade" id="wrapping-panel" role="tabpanel"
+                aria-labelledby="wrapping-tab">
+                <div className="row" id="wrappingSettingsPanel">
+                  {wrappingSettingsPanel}
                 </div>
               </div>
             </div>
