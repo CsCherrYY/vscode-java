@@ -25,7 +25,7 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps>
   }
 
   exp = () => {
-    exportSettings();
+    exportSettings("123");
   }
 
   handleChange(e) {

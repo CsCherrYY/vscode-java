@@ -3,15 +3,18 @@ import "bootstrap/js/src/tab";
 import * as $ from "jquery";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-const shiki = require('shiki');
 import "../css/vscode.scss";
-import { baz } from "./java.formatter.whitespace";
+import { formatCode } from "./vscode.api";
 
 const code = "class MyClass \{\n\tint a = 0, b = 1, c = 2, d = 3;\n\}";
 interface CodePreviewPanelProps {
   code: string;
 }
-export class CodePreviewPanel extends React.Component<CodePreviewPanelProps> {
+
+interface CodePreviewPanelStates {
+  value: string;
+}
+export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, CodePreviewPanelStates> {
 
   constructor(props: CodePreviewPanelProps) {
     super(props);
@@ -21,22 +24,18 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps> {
   }
 
   private handleChange = (event) => {
-	let temp = "";
-	shiki.getHighlighter({
-	  theme: 'nord'
-	}).then(highlighter => {
-		temp = highlighter.codeToHtml(event.target.value, "java");
-	});
-    this.setState({ value: temp });
+    this.setState({ value: event.target.value });
   }
 
   private format(value: string) {
-    document.getElementById("noter-text-area").readOnly = true;
-    this.setState({ value: "class MyClass \{\n\tint a = 0, b = 1, c = 2, d = 3;\n\}" });
+    const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;
+    element.readOnly = true;
+    formatCode(value);
   }
 
   private raw(value: string) {
-    document.getElementById("noter-text-area").readOnly = false;
+    const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;
+    element.readOnly = false;
     this.setState({ value: "class MyClass \{int a = 0,b = 1,c = 2,d = 3;\}" });
   }
 

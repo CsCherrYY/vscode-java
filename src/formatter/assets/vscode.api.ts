@@ -4,12 +4,13 @@ const vscode = acquireVsCodeApi();
 export function formatCode(code: string) {
   vscode.postMessage({
     command: "format",
-    code
+    code: code,
   });
 }
 
-export function exportSettings() {
+export function exportSettings(code: string) {
   vscode.postMessage({
-    command: "export",
+	command: "export",
+	code
   });
 }

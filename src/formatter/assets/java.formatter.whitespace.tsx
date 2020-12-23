@@ -8,7 +8,6 @@ import "../css/vscode.scss";
 import { JavaFormatterSetting, JavaFormatterSettingType } from ".";
 import { formatCode } from "./vscode.api";
 import { CodePreviewPanel } from "./java.formatter.code";
-import { settings } from "cluster";
 import { generateSettings } from "./utils";
 
 export interface WhitespaceSettingsProps {
@@ -34,7 +33,7 @@ export class WhitespaceSettingsPanel extends React.Component<WhitespaceSettingsP
                 <button id="btnCollapse" className="btn btn-link btn-sm" title="Collapse All" >Collapse All</button>
               </div>
             </div>
-            {generateSettings(this.props.whitespaceSettings)}
+            <div>{generateSettings(this.props.whitespaceSettings)}</div>
           </div>
           <div className="col-6">
             <h2 className="font-weight-light">Preview</h2>

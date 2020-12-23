@@ -14,7 +14,7 @@ module.exports = function (env, argv) {
 	  name: 'assets',
 	  mode: 'none',
 	  entry: {
-		'formatter': './src/formatter/assets/index.ts'
+		formatter: './src/formatter/assets/index.ts'
 	  },
 	  module: {
 		rules: [{
@@ -54,7 +54,7 @@ module.exports = function (env, argv) {
 		}),
 		new HtmlWebpackInlineSourcePlugin(),
 	  ],
-	  devtool: 'source-map',
+	  devtool: 'inline-source-map',
 	  resolve: {
 		extensions: ['.js', '.ts', '.tsx']
 	  }

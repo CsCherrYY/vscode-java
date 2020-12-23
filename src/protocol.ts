@@ -2,12 +2,14 @@
 
 import {
     CodeActionParams,
+    DocumentFormattingParams,
     ExecuteCommandParams,
     FormattingOptions,
     Location,
     NotificationType,
     RequestType,
     SymbolInformation,
+    TextEdit,
     TextDocumentIdentifier,
     TextDocumentPositionParams,
     WorkspaceEdit,

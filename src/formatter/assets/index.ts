@@ -7,6 +7,13 @@ import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
 import { JavaFormatterPanel } from "./java.formatter";
 
+window.addEventListener("message", event => {
+  if (event.data.command === "formattedCode") {
+    const testcode = event.data.code;
+    const test = 1;
+  }
+});
+
 export enum JavaFormatterSettingType {
   BOOLEAN = "boolean",
   NUMBER = "number",

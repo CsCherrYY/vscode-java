@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as os from 'os';
 import * as fs from 'fs';
 import * as fse from 'fs-extra';
-import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration, QuickPickItem, Disposable, QuickInputButtons, OpenDialogOptions, QuickPickOptions } from 'vscode';
+import { workspace, extensions, ExtensionContext, window, commands, ViewColumn, Uri, languages, IndentAction, InputBoxOptions, Selection, Position, EventEmitter, OutputChannel, TextDocument, RelativePattern, ConfigurationTarget, WorkspaceConfiguration, QuickPickItem, Disposable, QuickInputButtons, OpenDialogOptions, QuickPickOptions, TextEditor } from 'vscode';
 import { ExecuteCommandParams, ExecuteCommandRequest, LanguageClient, LanguageClientOptions, RevealOutputChannelOn, ErrorHandler, Message, ErrorAction, CloseAction, DidChangeConfigurationNotification, CancellationToken } from 'vscode-languageclient';
 import { collectJavaExtensions } from './plugin';
 import { prepareExecutable } from './javaServerStarter';
@@ -269,7 +269,7 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 
 			context.subscriptions.push(onConfigurationChange());
 
-			const provider = new JavaFormatterSettingsEditorProvider(context);
+			const provider = new JavaFormatterSettingsEditorProvider(context, storagePath);
 
 			context.subscriptions.push(window.registerCustomEditorProvider(JavaFormatterSettingsEditorProvider.viewType, provider));
 
@@ -280,6 +280,7 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 					ViewColumn.One,
 					{}
 				);
+				workspace.applyEdit
 				const document: TextDocument = await workspace.openTextDocument(context.asAbsolutePath("./dist/assets/formatter/index.html"));
 				provider.resolveCustomTextEditor(document, panel, undefined);
 			}));
