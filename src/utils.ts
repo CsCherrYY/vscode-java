@@ -129,7 +129,4 @@ export async function waitForDocumentChangesToEnd(document: TextDocument): Promi
 export namespace FormatterConstants {
 	export const IMPORT_FROM_REMOTE = "Import settings from remote URL";
 	export const IMPORT_FROM_LOCAL = "Import settings from Local File";
-	export const GOOGLE_PRESET = "Google Java Style preset";
-	export const ECLIPSE_PRESET = "Eclipse built-in preset";
-	export const JAVA_CONVENTION_PRESET = "Java Convention preset";
 }

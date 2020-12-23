@@ -101,8 +101,6 @@ export namespace Commands {
 
     export const OPEN_FORMATTER_SETTINGS = 'java.formatter.openSettings';
 
-    export const LOAD_SETTINGS_PRESET = 'java.formatter.loadPreset';
-
     /**
      * Clean the Java language server workspace
      */

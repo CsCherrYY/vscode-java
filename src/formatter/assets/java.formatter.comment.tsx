@@ -4,18 +4,35 @@ import * as $ from "jquery";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
-import { JavaFormatterSetting } from ".";
+import { JavaFormatterSetting, JavaFormatterSettingPanel } from ".";
 import { CodePreviewPanel } from "./java.formatter.code";
 import { generateSettings } from "./utils";
 
 export interface CommentSettingsProps {
+	filterValue: string;
   commentSettings?: JavaFormatterSetting[];
 }
 
-export class CommentSettingsPanel extends React.Component<CommentSettingsProps> {
+export interface CommentSettingsState {
+	commentSettings?: JavaFormatterSetting[];
+  }
+
+export class CommentSettingsPanel extends React.Component<CommentSettingsProps, CommentSettingsState> {
 
   constructor(props: CommentSettingsProps) {
-    super(props);
+	super(props);
+	this.state = { commentSettings: props.commentSettings };
+	window.addEventListener("message", event => {
+		if (event.data.command === "changeSettings") {
+			const element = document.getElementById(event.data.id);
+			if (!element) {
+				return;
+			}
+			if (element.checked !== event.data.value) {
+				element.checked = event.data.value;
+			}
+		}
+	});
   }
 
   private test: string = "\t/**\n\t * Descriptions of parameters and return values\n\
@@ -27,17 +44,19 @@ export class CommentSettingsPanel extends React.Component<CommentSettingsProps> 
   \t */\n\
   \t int foo(int first, int second)\n\t \tthrows Exception;";
 
+  private commentPreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.COMMENT });
+
   render() {
     return (
       <div className="col">
         <div className="row">
           <div className="col-6">
             <h2 className="font-weight-light">Comment</h2>
-            {generateSettings(this.props.commentSettings)}
+            {generateSettings(this.props.commentSettings, this.props.filterValue)}
           </div>
           <div className="col-6">
             <h2 className="font-weight-light">Preview</h2>
-            <CodePreviewPanel code={this.test} />
+            {this.commentPreviewPanel}
           </div>
         </div>
       </div>

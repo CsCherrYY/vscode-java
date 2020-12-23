@@ -261,8 +261,6 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 
 			context.subscriptions.push(commands.registerCommand(Commands.IMPORT_ECLIPSE_PROFILE, async () => openFormatter(context.extensionPath)));
 
-			context.subscriptions.push(commands.registerCommand(Commands.LOAD_SETTINGS_PRESET, async () => loadSettingsPreset()));
-
 			context.subscriptions.push(commands.registerCommand(Commands.OPEN_FORMATTER_SETTINGS, async () => openFormatterSettings()));
 
 			context.subscriptions.push(commands.registerCommand(Commands.CLEAN_WORKSPACE, () => cleanWorkspace(workspacePath)));
@@ -660,18 +658,6 @@ async function openFormatter(extensionPath): Promise<void> {
 			addFormatter(extensionPath, file, defaultFormatter, relativePath);
 		}
 	}*/
-}
-
-async function loadSettingsPreset() {
-	const presetItems: QuickPickItem[] = [{ label: FormatterConstants.GOOGLE_PRESET }, { label: FormatterConstants.ECLIPSE_PRESET }, { label: FormatterConstants.JAVA_CONVENTION_PRESET }];
-	const options: QuickPickOptions = {
-		placeHolder: "Select a VS Code Java formatter settings preset to load",
-	};
-	const preset = await window.showQuickPick(presetItems, options);
-	if (preset === undefined) {
-		return;
-	}
-	commands.executeCommand('workbench.action.openSettings', "@ext:redhat.java java.format");
 }
 
 function openFormatterSettings() {

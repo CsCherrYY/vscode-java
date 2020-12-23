@@ -869,11 +869,6 @@
         "category": "Java"
       },
       {
-        "command": "java.formatter.loadPreset",
-        "title": "Load VS Code Java formatter settings preset",
-        "category": "Java"
-      },
-      {
         "command": "java.clean.workspace",
         "title": "Clean Java Language Server Workspace",
         "category": "Java"
