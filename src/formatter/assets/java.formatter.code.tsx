@@ -7,16 +7,14 @@ import "../css/vscode.scss";
 import { formatCode } from "./vscode.api";
 import { JavaFormatterSettingPanel } from ".";
 
-const code = "class MyClass \{\n\tint a = 0, b = 1, c = 2, d = 3;\n\}";
 interface CodePreviewPanelProps {
 	code: string;
 	panel: JavaFormatterSettingPanel;
 }
 
 interface CodePreviewPanelStates {
-	value: string;  //To display
+	value: string;
 	code: string;
-	formattedCode: string;
 	lastStepIsFormat: boolean;
 }
 export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, CodePreviewPanelStates> {
@@ -26,7 +24,6 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 		this.state = {
 			value: props.code,
 			code: props.code,
-			formattedCode: props.code,
 			lastStepIsFormat: false,
 		};
 		window.addEventListener("message", event => {
@@ -36,7 +33,7 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 				if (panelType === this.props.panel) {
 					this.updateCode(code);
 				}
-			} else if (event.data.command === "formatCode") {
+			} else if (event.data.command === "formatCode" && event.data.panel === this.props.panel) {
 				this.format(this.state.value);
 			}
 		});

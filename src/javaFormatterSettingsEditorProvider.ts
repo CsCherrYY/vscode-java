@@ -1,9 +1,11 @@
 'use strict';
 
-const fs = require('fs').promises;
+const fsPromise = require('fs').promises;
+import { existsSync } from "fs-extra";
 import { join } from "path";
-import { CancellationToken, commands, CommentThreadCollapsibleState, CustomTextEditorProvider, ExtensionContext, Position, TextDocument, TextEdit, Uri, WebviewPanel, window, workspace, WorkspaceEdit } from "vscode";
+import { CancellationToken, commands, CommentThreadCollapsibleState, CustomTextEditorProvider, ExtensionContext, Range,  Position, TextDocument, TextEdit, Uri, WebviewPanel, window, workspace, WorkspaceEdit, TextEditor, comments } from "vscode";
 import { DocumentFormattingParams, FormattingOptions, LanguageClient, TextDocumentIdentifier } from "vscode-languageclient";
+import { filename } from "winston-daily-rotate-file";
 import { Commands } from "./commands";
 import { getActiveLanguageClient } from "./extension";
 import { JavaFormatterSettingPanel } from "./formatter/assets";
@@ -12,8 +14,6 @@ import { loadTextFromFile } from "./formatter/index";
 export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProvider {
 
 	public static readonly viewType = 'vscjava.javaFormatterSettings';
-
-	private client: LanguageClient;
 
 	private storagePath: string;
 
@@ -61,9 +61,23 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 		});
 
 		this.context.subscriptions.push(workspace.onDidChangeConfiguration((e) => {
-			webviewPanel.webview.postMessage({
-				command: "formatCode"
-			});
+			const a = e.affectsConfiguration("java.format.insertSpace");
+			if (e.affectsConfiguration("java.format.comments.offOnTag")) {
+				webviewPanel.webview.postMessage({
+					command: "formatCode",
+					panel: "comment",
+				});
+			} else if (e.affectsConfiguration("java.format.insertLine.controlStatement") || e.affectsConfiguration("java.format.insertLine.controlStatement.keepSimple")) {
+				webviewPanel.webview.postMessage({
+					command: "formatCode",
+					panel: "wrapping",
+				});
+			} else {
+				webviewPanel.webview.postMessage({
+					command: "formatCode",
+					panel: "whiteSpace",
+				});
+			}
 		}));
 
 		webviewPanel.onDidDispose(() => {
@@ -75,39 +89,39 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 			switch (e.command) {
 				case "format": {
 					const codeToFormat: string = e.code;
-					const panelType = e.panel;
-					const formatterFilePath: string = join(this.storagePath, `${Date.now()}.java`);
-					await fs.writeFile(formatterFilePath, codeToFormat);
+					const formatterFilePath: string = join(this.storagePath, `formatter.java`);
+					if (!existsSync(formatterFilePath)) {
+						await fsPromise.writeFile(formatterFilePath, codeToFormat);
+					}
 					const formatterUri: Uri = Uri.file(formatterFilePath);
 					const document = await workspace.openTextDocument(formatterFilePath);
+					// await fs.writeFile(formatterFilePath, codeToFormat);
+					const workspaceEditPre: WorkspaceEdit = new WorkspaceEdit();
+					workspaceEditPre.replace(formatterUri, new Range(0, 0, document.lineCount, 0), codeToFormat);
+					await workspace.applyEdit(workspaceEditPre);
+					//document.save();
 					const formattingOptions: FormattingOptions = {
 						tabSize: 4,
 						insertSpaces: false,
 					};
-					if (!this.client) {
-						this.client = await getActiveLanguageClient();
-						if (!this.client) {
-							return;
-						}
-					}
 					const result = await commands.executeCommand<TextEdit[]>(
 						"vscode.executeFormatDocumentProvider", Uri.file(formatterFilePath), formattingOptions);
 					if (!result) {
 						return;
 					}
-					const edit = this.client.protocol2CodeConverter.asTextEdits(result);
+					// const edit = this.client.protocol2CodeConverter.asTextEdits(result);
 					const workspaceEdit: WorkspaceEdit = new WorkspaceEdit();
-					workspaceEdit.set(formatterUri, edit);
+					workspaceEdit.set(formatterUri, result);
 					await workspace.applyEdit(workspaceEdit);
-					await document.save();
+					//document.save();
 					await webviewPanel.webview.postMessage({
 						command: "formattedCode",
-						code: (await fs.readFile(formatterFilePath)).toString(),
-						panel: panelType
+						code: document.getText(),
+						panel: e.panel
 					});
-					const workspaceEditClean: WorkspaceEdit = new WorkspaceEdit();
-					workspaceEditClean.deleteFile(formatterUri);
-					await workspace.applyEdit(workspaceEditClean);
+					// const workspaceEditClean: WorkspaceEdit = new WorkspaceEdit();
+					// workspaceEditClean.deleteFile(formatterUri);
+					// await workspace.applyEdit(workspaceEditClean);
 					break;
 				}
 				case "export": {
