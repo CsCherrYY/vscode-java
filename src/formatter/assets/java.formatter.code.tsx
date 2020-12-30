@@ -6,6 +6,7 @@ import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
 import { formatCode } from "./vscode.api";
 import { JavaFormatterSettingPanel } from ".";
+import { CodeHighlight } from "./java.formatter.highlight";
 
 interface CodePreviewPanelProps {
 	code: string;
@@ -14,7 +15,7 @@ interface CodePreviewPanelProps {
 
 interface CodePreviewPanelStates {
 	value: string;
-	code: string;
+	highlightedCode: string;
 	lastStepIsFormat: boolean;
 }
 export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, CodePreviewPanelStates> {
@@ -23,7 +24,7 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 		super(props);
 		this.state = {
 			value: props.code,
-			code: props.code,
+			highlightedCode: props.code,
 			lastStepIsFormat: false,
 		};
 		window.addEventListener("message", event => {
@@ -34,45 +35,47 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 					this.updateCode(code);
 				}
 			} else if (event.data.command === "formatCode" && event.data.panel === this.props.panel) {
-				this.format(this.state.value);
+				this.format();
 			}
 		});
+		this.raw();
 	}
 
 	private handleChange = (event) => {
 		this.setState({ value: event.target.value });
 	}
 
-	public format(value: string) {
-		const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;
+	public format() {
+		/*const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;
 		element.readOnly = true;
 		if (!this.state.lastStepIsFormat) {
 			this.setState({ code: this.state.value });
-		}
-		formatCode(value, this.props.panel);
+		}*/
+		formatCode(this.state.value, this.props.panel, true);
 		this.setState({ lastStepIsFormat: true });
 	}
 
 	private raw() {
-		const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;
-		element.readOnly = false;
-		this.setState({ value: this.state.code, lastStepIsFormat: false });
+		/*const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;
+		element.readOnly = false;*/
+		formatCode(this.state.value, this.props.panel, false);
+		this.setState({ lastStepIsFormat: false });
 	}
 
 	public updateCode(code: string) {
-		this.setState({ value: code });
+		this.setState({ highlightedCode: code });
 	}
 
 	render() {
 		return (
 			<div id="root">
-				<form id="noter-save-form" method="POST">
-					<textarea id="noter-text-area" className="md-textarea form-control form-control-lg" rows={15} name="textarea" value={this.state.value} onChange={this.handleChange} />
-				</form>
+				<CodeHighlight>
+					{this.state.highlightedCode}
+				</CodeHighlight>
 				<div className="row">
 					<div className="col-lg-12">
-						<button onClick={() => this.format(this.state.value)} id="btnFormat" className="btn btn-primary mr-2 float-right" title="Format Code">Format Code</button>
-						<button onClick={() => this.raw()} id="btnRaw" className="btn btn-primary mr-2 float-right" title="Edit Raw Code" disabled={!this.state.lastStepIsFormat}>Edit Raw Code</button>
+						<button onClick={() => this.format()} id="btnFormat" className="btn btn-primary mr-2 float-right" title="Format Code">Format Code</button>
+						<button onClick={() => this.raw()} id="btnRaw" className="btn btn-primary mr-2 float-right" title="Edit Raw Code" disabled={!this.state.lastStepIsFormat}>See Raw Code</button>
 					</div>
 				</div>
 			</div>

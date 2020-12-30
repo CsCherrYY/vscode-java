@@ -37,7 +37,14 @@ module.exports = function (env, argv) {
 		  }, {
 			loader: 'sass-loader'
 		  }]
-		}]
+		}, {
+			test: /\.(css)$/,
+			use: [{
+			  loader: 'style-loader'
+			}, {
+			  loader: 'css-loader'
+			}]
+		  }]
 	  },
 	  output: {
 		filename: 'assets/[name]/index.js',
@@ -89,7 +96,23 @@ module.exports = function (env, argv) {
 				use: [{
 					loader: 'ts-loader',
 				}]
-			}]
+			}, {
+				test: /\.css$/,
+				use: [{
+				  loader: 'style-loader'
+				}, {
+				  loader: 'css-loader'
+				}, {
+				  loader: 'postcss-loader',
+				  options: {
+					plugins: function () {
+					  return [require('autoprefixer')];
+					}
+				  }
+				}, {
+				  loader: 'sass-loader'
+				}]
+			  }]
 		},
 	}]
   };

@@ -10,7 +10,7 @@ import { Commands } from "./commands";
 import { getActiveLanguageClient } from "./extension";
 import { JavaFormatterSettingPanel } from "./formatter/assets";
 import { loadTextFromFile } from "./formatter/index";
-
+//import * as hljs from 'highlight.js';
 export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProvider {
 
 	public static readonly viewType = 'vscjava.javaFormatterSettings';
@@ -89,6 +89,16 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 			switch (e.command) {
 				case "format": {
 					const codeToFormat: string = e.code;
+					//const a = hljs.highlightAuto(codeToFormat).value;
+					const format: boolean = e.format;
+					if (!format) {
+						webviewPanel.webview.postMessage({
+							command: "formattedCode",
+							code: /*hljs.highlightAuto(codeToFormat).value*/codeToFormat,
+							panel: e.panel
+						});
+						return;
+					}
 					const formatterFilePath: string = join(this.storagePath, `formatter.java`);
 					if (!existsSync(formatterFilePath)) {
 						await fsPromise.writeFile(formatterFilePath, codeToFormat);
@@ -116,7 +126,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					//document.save();
 					await webviewPanel.webview.postMessage({
 						command: "formattedCode",
-						code: document.getText(),
+						code: /*hljs.highlightAuto(document.getText()).value*/document.getText(),
 						panel: e.panel
 					});
 					// const workspaceEditClean: WorkspaceEdit = new WorkspaceEdit();
@@ -146,11 +156,6 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					const settingName = id.substring(dotIndex + 1);
 					await workspace.getConfiguration(configurationName).update(settingName, e.value);
 					break;
-				}
-				case "formatCodeOnDidChangeSettings": {
-					await webviewPanel.webview.postMessage({
-						command: "formatCode"
-					});
 				}
 				default:
 					break;

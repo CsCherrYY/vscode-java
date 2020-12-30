@@ -3,17 +3,12 @@ import { JavaFormatterSettingPanel } from ".";
 declare function acquireVsCodeApi(): any;
 const vscode = acquireVsCodeApi();
 
-export function formatCode(code: string, panel: JavaFormatterSettingPanel) {
+export function formatCode(code: string, panel: JavaFormatterSettingPanel, format: boolean) {
 	vscode.postMessage({
 		command: "format",
 		code: code,
 		panel: panel,
-	});
-}
-
-export function formatCodeOnDidChangeSettings() {
-	vscode.postMessage({
-		command: "formatCodeOnDidChangeSettings",
+		format: format,
 	});
 }
 

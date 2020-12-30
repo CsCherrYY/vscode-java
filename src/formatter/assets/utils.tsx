@@ -5,7 +5,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
 import { JavaFormatterSetting, JavaFormatterSettingType } from ".";
-import { changeSettingBoolean, changeSettingString, formatCodeOnDidChangeSettings } from "./vscode.api";
+import { changeSettingBoolean, changeSettingString } from "./vscode.api";
 
 const handleChange = (e) => {
 	const checked = e.target.checked;  // for boolean, boolean
