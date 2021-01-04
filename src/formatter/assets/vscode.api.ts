@@ -12,29 +12,15 @@ export function formatCode(code: string, panel: JavaFormatterSettingPanel, forma
 	});
 }
 
-export function exportSettings() {
-	vscode.postMessage({
-		command: "export",
-	});
-}
-
 export function importSettings() {
 	vscode.postMessage({
 		command: "import",
 	});
 }
 
-export function changeSettingString(id: string, value: string) {
+export function changeSetting(id: string, value: any) {
 	vscode.postMessage({
-		command: "changeSettingString",
-		id: id,
-		value: value,
-	});
-}
-
-export function changeSettingBoolean(id: string, value: boolean) {
-	vscode.postMessage({
-		command: "changeSettingBoolean",
+		command: "changeSetting",
 		id: id,
 		value: value,
 	});

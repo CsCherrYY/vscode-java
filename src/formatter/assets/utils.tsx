@@ -5,7 +5,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
 import { JavaFormatterSetting, JavaFormatterSettingType } from ".";
-import { changeSettingBoolean, changeSettingString } from "./vscode.api";
+import { changeSetting } from "./vscode.api";
 
 const handleChange = (e) => {
 	const checked = e.target.checked;  // for boolean, boolean
@@ -13,9 +13,9 @@ const handleChange = (e) => {
 	const id = e.target.id;
 	const className = e.target.className;  // "form-control" or "form-check-input"
 	if (className === "form-control") { // enum
-		changeSettingString(id, value);
+		changeSetting(id, value);
 	} else if (className === "form-check-input") {
-		changeSettingBoolean(id, checked);
+		changeSetting(id, checked);
 	}
 };
 

@@ -6,7 +6,7 @@ import "../css/vscode.scss";
 import { JavaFormatterSetting, JavaFormatterSettingPanel } from ".";
 import { CommentSettingsPanel } from "./java.formatter.comment";
 import { WrappingSettingsPanel } from "./java.formatter.wrapping";
-import { exportSettings, importSettings } from "./vscode.api";
+import { importSettings } from "./vscode.api";
 import { WhitespaceSettingsPanel } from "./java.formatter.whitespace";
 /*
 window.addEventListener("message", event => {
@@ -86,7 +86,6 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps>
 						</div>
 					</div>
 					<div className="col-4">
-						<button id="btnExport" className="btn btn-primary mr-2 float-right" title="Export Settings" onClick={this.exportSetting}>Export</button>
 						<button id="btnImport" className="btn btn-primary mr-2 float-right" title="Import Settings from eclipse Java formatter settings profile" onClick={this.importSetting}>Import from Profile...</button>
 					</div>
 				</div>

@@ -278,8 +278,7 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 					ViewColumn.One,
 					{}
 				);
-				workspace.applyEdit
-				const document: TextDocument = await workspace.openTextDocument(context.asAbsolutePath("./dist/assets/formatter/index.html"));
+				const document: TextDocument = await workspace.openTextDocument(context.asAbsolutePath("./formatters/eclipse.xml"));
 				provider.resolveCustomTextEditor(document, panel, undefined);
 			}));
 

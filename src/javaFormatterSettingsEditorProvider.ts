@@ -1,16 +1,17 @@
 'use strict';
 
 const fsPromise = require('fs').promises;
+import { writeFileSync } from "fs";
 import { existsSync } from "fs-extra";
 import { join } from "path";
-import { CancellationToken, commands, CommentThreadCollapsibleState, CustomTextEditorProvider, ExtensionContext, Range,  Position, TextDocument, TextEdit, Uri, WebviewPanel, window, workspace, WorkspaceEdit, TextEditor, comments } from "vscode";
+import { CancellationToken, commands, CommentThreadCollapsibleState, CustomTextEditorProvider, ExtensionContext, Range, Position, TextDocument, TextEdit, Uri, WebviewPanel, window, workspace, WorkspaceEdit, TextEditor, comments, CustomDocumentOpenContext } from "vscode";
 import { DocumentFormattingParams, FormattingOptions, LanguageClient, TextDocumentIdentifier } from "vscode-languageclient";
 import { filename } from "winston-daily-rotate-file";
 import { Commands } from "./commands";
 import { getActiveLanguageClient } from "./extension";
 import { JavaFormatterSettingPanel } from "./formatter/assets";
 import { loadTextFromFile } from "./formatter/index";
-//import * as hljs from 'highlight.js';
+const xml2js = require('xml2js');
 export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProvider {
 
 	public static readonly viewType = 'vscjava.javaFormatterSettings';
@@ -19,6 +20,37 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 
 	constructor(private readonly context: ExtensionContext, storagePath: string) {
 		this.storagePath = storagePath;
+	}
+
+	private async changeFormatterSettings(document: TextDocument, settingName: string, settingValue: string): Promise<any> {
+		const text: string = document.getText();
+		if (text.trim().length === 0) {
+			return {};
+		}
+		try {
+			const result = await xml2js.parseStringPromise(text);
+			if (result.profiles.profile.length === 1) {
+				for (const setting of result.profiles.profile[0].setting) {
+					const a = setting.$;
+					if (setting.$.id === settingName) {
+						setting.$.value = settingValue;
+					}
+				}
+			}
+			const builder = new xml2js.Builder();
+			const resultObject = builder.buildObject(result);
+			const edit = new WorkspaceEdit();
+
+			edit.replace(
+				document.uri,
+				new Range(0, 0, document.lineCount, 0),
+				resultObject);
+
+			await workspace.applyEdit(edit);
+			return {};
+		} catch (e) {
+			throw new Error(e);
+		}
 	}
 
 	public async resolveCustomTextEditor(document: TextDocument, webviewPanel: WebviewPanel, _token: CancellationToken): Promise<void> {
@@ -31,16 +63,16 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 
 		async function updateWebview() {
 			const settings: string[] = ["java.format.insertLine.controlStatement",
-			"java.format.insertLine.controlStatement.keepSimple",
-			"java.format.comments.offOnTag",
-			"java.format.insertSpace.before.binaryOperator",
-			"java.format.insertSpace.after.binaryOperator",
-			"java.format.insertSpace.before.comma",
-			"java.format.insertSpace.after.comma",
-			"java.format.insertSpace.before.closingParenthesis",
-			"java.format.insertSpace.before.openingParenthesis.controlStatement",
-			"java.format.insertSpace.after.openingParenthesis",
-			"java.format.insertSpace.before.openingBrace"];
+				"java.format.insertLine.controlStatement.keepSimple",
+				"java.format.comments.offOnTag",
+				"java.format.insertSpace.before.binaryOperator",
+				"java.format.insertSpace.after.binaryOperator",
+				"java.format.insertSpace.before.comma",
+				"java.format.insertSpace.after.comma",
+				"java.format.insertSpace.before.closingParenthesis",
+				"java.format.insertSpace.before.openingParenthesis.controlStatement",
+				"java.format.insertSpace.after.openingParenthesis",
+				"java.format.insertSpace.before.openingBrace"];
 			for (const setting of settings) {
 				const dotIndex = setting.lastIndexOf(".");
 				const configurationName = setting.substring(0, dotIndex);
@@ -89,12 +121,11 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 			switch (e.command) {
 				case "format": {
 					const codeToFormat: string = e.code;
-					//const a = hljs.highlightAuto(codeToFormat).value;
 					const format: boolean = e.format;
 					if (!format) {
 						webviewPanel.webview.postMessage({
 							command: "formattedCode",
-							code: /*hljs.highlightAuto(codeToFormat).value*/codeToFormat,
+							code: codeToFormat,
 							panel: e.panel
 						});
 						return;
@@ -105,11 +136,9 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					}
 					const formatterUri: Uri = Uri.file(formatterFilePath);
 					const document = await workspace.openTextDocument(formatterFilePath);
-					// await fs.writeFile(formatterFilePath, codeToFormat);
 					const workspaceEditPre: WorkspaceEdit = new WorkspaceEdit();
 					workspaceEditPre.replace(formatterUri, new Range(0, 0, document.lineCount, 0), codeToFormat);
 					await workspace.applyEdit(workspaceEditPre);
-					//document.save();
 					const formattingOptions: FormattingOptions = {
 						tabSize: 4,
 						insertSpaces: false,
@@ -123,7 +152,6 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					const workspaceEdit: WorkspaceEdit = new WorkspaceEdit();
 					workspaceEdit.set(formatterUri, result);
 					await workspace.applyEdit(workspaceEdit);
-					//document.save();
 					await webviewPanel.webview.postMessage({
 						command: "formattedCode",
 						code: /*hljs.highlightAuto(document.getText()).value*/document.getText(),
@@ -134,27 +162,18 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					// await workspace.applyEdit(workspaceEditClean);
 					break;
 				}
-				case "export": {
-					commands.executeCommand("vscode.open", Uri.file("code"));
-					break;
-				}
 				case "import": {
 					commands.executeCommand(Commands.IMPORT_ECLIPSE_PROFILE);
 				}
-				case "changeSettingString": {
-					const id: string = e.id;
+				case "changeSetting": {
+					/*const id: string = e.id;
 					const dotIndex = id.lastIndexOf(".");
 					const configurationName = id.substring(0, dotIndex);
 					const settingName = id.substring(dotIndex + 1);
-					await workspace.getConfiguration(configurationName).update(settingName, e.value);
-					break;
-				}
-				case "changeSettingBoolean": {
-					const id: string = e.id;
-					const dotIndex = id.lastIndexOf(".");
-					const configurationName = id.substring(0, dotIndex);
-					const settingName = id.substring(dotIndex + 1);
-					await workspace.getConfiguration(configurationName).update(settingName, e.value);
+					await workspace.getConfiguration(configurationName).update(settingName, e.value);*/
+					e.id = "org.eclipse.jdt.core.formatter.insert_space_after_multiplicative_operator";
+					e.value = "do not insert";
+					this.changeFormatterSettings(document, e.id, e.value.toString());
 					break;
 				}
 				default:

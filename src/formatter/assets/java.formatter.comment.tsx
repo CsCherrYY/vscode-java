@@ -44,7 +44,6 @@ export class CommentSettingsPanel extends React.Component<CommentSettingsProps, 
 \t */\n\
 \t public int foo(int first, int second){\n\t \tthrows Exception;}\n\}";
 
-
 	private commentPreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.COMMENT });
 
 	render() {
