@@ -25,13 +25,12 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 	private async changeFormatterSettings(document: TextDocument, settingName: string, settingValue: string): Promise<any> {
 		const text: string = document.getText();
 		if (text.trim().length === 0) {
-			return {};
+			return;
 		}
 		try {
 			const result = await xml2js.parseStringPromise(text);
 			if (result.profiles.profile.length === 1) {
 				for (const setting of result.profiles.profile[0].setting) {
-					const a = setting.$;
 					if (setting.$.id === settingName) {
 						setting.$.value = settingValue;
 					}
@@ -40,16 +39,21 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 			const builder = new xml2js.Builder();
 			const resultObject = builder.buildObject(result);
 			const edit = new WorkspaceEdit();
-
 			edit.replace(
 				document.uri,
 				new Range(0, 0, document.lineCount, 0),
 				resultObject);
-
 			await workspace.applyEdit(edit);
-			return {};
+			document.save();
 		} catch (e) {
 			throw new Error(e);
+		}
+	}
+
+	private loadFormatterSettings(document: TextDocument) {
+		const text: string = document.getText();
+		if (text.trim().length === 0) {
+			return;
 		}
 	}
 
@@ -91,26 +95,6 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 				updateWebview();
 			}
 		});
-
-		this.context.subscriptions.push(workspace.onDidChangeConfiguration((e) => {
-			const a = e.affectsConfiguration("java.format.insertSpace");
-			if (e.affectsConfiguration("java.format.comments.offOnTag")) {
-				webviewPanel.webview.postMessage({
-					command: "formatCode",
-					panel: "comment",
-				});
-			} else if (e.affectsConfiguration("java.format.insertLine.controlStatement") || e.affectsConfiguration("java.format.insertLine.controlStatement.keepSimple")) {
-				webviewPanel.webview.postMessage({
-					command: "formatCode",
-					panel: "wrapping",
-				});
-			} else {
-				webviewPanel.webview.postMessage({
-					command: "formatCode",
-					panel: "whiteSpace",
-				});
-			}
-		}));
 
 		webviewPanel.onDidDispose(() => {
 			changeDocumentSubscription.dispose();
@@ -154,7 +138,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					await workspace.applyEdit(workspaceEdit);
 					await webviewPanel.webview.postMessage({
 						command: "formattedCode",
-						code: /*hljs.highlightAuto(document.getText()).value*/document.getText(),
+						code: document.getText(),
 						panel: e.panel
 					});
 					// const workspaceEditClean: WorkspaceEdit = new WorkspaceEdit();
@@ -172,7 +156,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					const settingName = id.substring(dotIndex + 1);
 					await workspace.getConfiguration(configurationName).update(settingName, e.value);*/
 					e.id = "org.eclipse.jdt.core.formatter.insert_space_after_multiplicative_operator";
-					e.value = "do not insert";
+					e.value = "kkk";
 					this.changeFormatterSettings(document, e.id, e.value.toString());
 					break;
 				}

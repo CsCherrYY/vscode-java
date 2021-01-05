@@ -99,7 +99,7 @@ export namespace Commands {
      */
     export const IMPORT_ECLIPSE_PROFILE = 'java.formatter.import.eclipse';
 
-    export const OPEN_FORMATTER_SETTINGS = 'java.formatter.openSettings';
+    export const OPEN_FORMATTER = 'java.open.formatter.settings';
 
     /**
      * Clean the Java language server workspace

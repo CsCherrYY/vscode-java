@@ -854,7 +854,7 @@
         "category": "Java"
       },
       {
-        "command": "java.formatter.openSettings",
+        "command": "java.open.formatter.settings",
         "title": "Open Java Formatter Settings",
         "category": "Java"
       },
@@ -1005,10 +1005,10 @@
         "displayName": "Java Formatter Settings",
         "selector": [
           {
-            "filenamePattern": "*.xml"
+            "filenamePattern": "vscode-java.xml"
           }
         ],
-        "priority": "option"
+        "priority": "default"
       }
     ]
   },
