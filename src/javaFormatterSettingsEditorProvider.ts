@@ -1,16 +1,12 @@
 'use strict';
 
-const fsPromise = require('fs').promises;
-import { writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { existsSync } from "fs-extra";
 import { join } from "path";
-import { CancellationToken, commands, CommentThreadCollapsibleState, CustomTextEditorProvider, ExtensionContext, Range, Position, TextDocument, TextEdit, Uri, WebviewPanel, window, workspace, WorkspaceEdit, TextEditor, comments, CustomDocumentOpenContext } from "vscode";
-import { DocumentFormattingParams, FormattingOptions, LanguageClient, TextDocumentIdentifier } from "vscode-languageclient";
-import { filename } from "winston-daily-rotate-file";
+import { CancellationToken, commands, CustomTextEditorProvider, ExtensionContext, Range, TextDocument, TextEdit, Uri, WebviewPanel, workspace, WorkspaceEdit } from "vscode";
+import { FormattingOptions } from "vscode-languageclient";
 import { Commands } from "./commands";
-import { getActiveLanguageClient } from "./extension";
-import { JavaFormatterSettingPanel } from "./formatter/assets";
-import { loadTextFromFile } from "./formatter/index";
+import { formatterSettingConverter } from "./formatter/FormatterSettingConverter";
 const xml2js = require('xml2js');
 export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProvider {
 
@@ -22,7 +18,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 		this.storagePath = storagePath;
 	}
 
-	private async changeFormatterSettings(document: TextDocument, settingName: string, settingValue: string): Promise<any> {
+	private async changeFormatterSettings(document: TextDocument, targetSettings: string[], settingValue: string): Promise<any> {
 		const text: string = document.getText();
 		if (text.trim().length === 0) {
 			return;
@@ -31,8 +27,10 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 			const result = await xml2js.parseStringPromise(text);
 			if (result.profiles.profile.length === 1) {
 				for (const setting of result.profiles.profile[0].setting) {
-					if (setting.$.id === settingName) {
-						setting.$.value = settingValue;
+					for (const targetSetting of targetSettings) {
+						if (setting.$.id === targetSetting) {
+							setting.$.value = settingValue;
+						}
 					}
 				}
 			}
@@ -63,31 +61,10 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 			enableCommandUris: true,
 		};
 		const resourceUri = this.context.asAbsolutePath("./dist/assets/formatter/index.html");
-		webviewPanel.webview.html = await loadTextFromFile(resourceUri);
+		const buffer: string = readFileSync(resourceUri).toString();
+		webviewPanel.webview.html = buffer;
 
 		async function updateWebview() {
-			const settings: string[] = ["java.format.insertLine.controlStatement",
-				"java.format.insertLine.controlStatement.keepSimple",
-				"java.format.comments.offOnTag",
-				"java.format.insertSpace.before.binaryOperator",
-				"java.format.insertSpace.after.binaryOperator",
-				"java.format.insertSpace.before.comma",
-				"java.format.insertSpace.after.comma",
-				"java.format.insertSpace.before.closingParenthesis",
-				"java.format.insertSpace.before.openingParenthesis.controlStatement",
-				"java.format.insertSpace.after.openingParenthesis",
-				"java.format.insertSpace.before.openingBrace"];
-			for (const setting of settings) {
-				const dotIndex = setting.lastIndexOf(".");
-				const configurationName = setting.substring(0, dotIndex);
-				const settingName = setting.substring(dotIndex + 1);
-				const value = await workspace.getConfiguration(configurationName).get(settingName);
-				await webviewPanel.webview.postMessage({
-					command: "changeSettings",
-					id: setting,
-					value: value
-				});
-			}
 		}
 
 		const changeDocumentSubscription = workspace.onDidChangeTextDocument(e => {
@@ -116,7 +93,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					}
 					const formatterFilePath: string = join(this.storagePath, `formatter.java`);
 					if (!existsSync(formatterFilePath)) {
-						await fsPromise.writeFile(formatterFilePath, codeToFormat);
+						writeFileSync(formatterFilePath, codeToFormat);
 					}
 					const formatterUri: Uri = Uri.file(formatterFilePath);
 					const document = await workspace.openTextDocument(formatterFilePath);
@@ -125,7 +102,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					await workspace.applyEdit(workspaceEditPre);
 					const formattingOptions: FormattingOptions = {
 						tabSize: 4,
-						insertSpaces: false,
+						insertSpaces: true,
 					};
 					const result = await commands.executeCommand<TextEdit[]>(
 						"vscode.executeFormatDocumentProvider", Uri.file(formatterFilePath), formattingOptions);
@@ -141,6 +118,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 						code: document.getText(),
 						panel: e.panel
 					});
+					document.save();
 					// const workspaceEditClean: WorkspaceEdit = new WorkspaceEdit();
 					// workspaceEditClean.deleteFile(formatterUri);
 					// await workspace.applyEdit(workspaceEditClean);
@@ -150,14 +128,12 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					commands.executeCommand(Commands.IMPORT_ECLIPSE_PROFILE);
 				}
 				case "changeSetting": {
-					/*const id: string = e.id;
-					const dotIndex = id.lastIndexOf(".");
-					const configurationName = id.substring(0, dotIndex);
-					const settingName = id.substring(dotIndex + 1);
-					await workspace.getConfiguration(configurationName).update(settingName, e.value);*/
-					e.id = "org.eclipse.jdt.core.formatter.insert_space_after_multiplicative_operator";
-					e.value = "kkk";
-					this.changeFormatterSettings(document, e.id, e.value.toString());
+					const settings: string[] = formatterSettingConverter.convert(e.id);
+					if (!settings) {
+						return;
+					}
+					const settingValue: string = formatterSettingConverter.valueConvert(e.id, e.value.toString());
+					this.changeFormatterSettings(document, settings, settingValue);
 					break;
 				}
 				default:

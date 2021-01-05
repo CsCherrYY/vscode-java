@@ -864,11 +864,6 @@
         "category": "Java"
       },
       {
-        "command": "java.formatter.openSettingsWeb",
-        "title": "Open Java Formatter Settings configuration",
-        "category": "Java"
-      },
-      {
         "command": "java.clean.workspace",
         "title": "Clean Java Language Server Workspace",
         "category": "Java"

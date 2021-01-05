@@ -34,17 +34,17 @@ interface JavaFormatterPanelProps {
 	wrappingSettings?: JavaFormatterSetting[];
 }
 
-export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps> {
+interface JavaFormatterPanelStates {
+	filterValue?: string;
+}
+
+export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps, JavaFormatterPanelStates> {
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			filterValue: "",
 		};
-	}
-
-	exportSetting = () => {
-		exportSettings();
 	}
 
 	importSetting = () => {

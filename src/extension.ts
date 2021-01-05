@@ -271,10 +271,6 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 
 			context.subscriptions.push(window.registerCustomEditorProvider(JavaFormatterSettingsEditorProvider.viewType, provider));
 
-			context.subscriptions.push(commands.registerCommand("java.formatter.openSettingsWeb", async () => {
-				commands.executeCommand("vscode.open", Uri.file("C:/formatters/eclipse.xml"));
-			}));
-
 			/**
 			 * Command to switch the server mode. Currently it only supports switch from lightweight to standard.
 			 * @param force force to switch server mode without asking
@@ -650,16 +646,16 @@ async function openFormatter(extensionPath: string): Promise<void> {
 	addFormatter(extensionPath, file, defaultFormatter, relativePath);
 }
 
-function getPath(f) {
-	if (workspace.workspaceFolders && !path.isAbsolute(f)) {
-		workspace.workspaceFolders.forEach(wf => {
-			const file = path.resolve(wf.uri.fsPath, f);
-			if (fs.existsSync(file)) {
-				return file;
+function getPath(file: string) {
+	if (workspace.workspaceFolders && !path.isAbsolute(file)) {
+		for (const folder of workspace.workspaceFolders) {
+			const filePath = path.resolve(folder.uri.fsPath, file);
+			if (fs.existsSync(filePath)) {
+				return filePath;
 			}
-		});
+		}
 	} else {
-		return path.resolve(f);
+		return path.resolve(file);
 	}
 	return null;
 }

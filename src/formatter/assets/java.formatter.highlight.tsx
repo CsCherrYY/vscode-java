@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import * as hljs from 'highlight.js';   // import hljs library
 import 'highlight.js/styles/vs2015.css';      // import your preferred style
-//import "../css/vscode.scss";
 
 interface HighlightPanelProps {
 	language?: string;

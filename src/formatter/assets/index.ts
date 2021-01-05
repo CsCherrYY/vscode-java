@@ -6,6 +6,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
 import { JavaFormatterPanel } from "./java.formatter";
+import { FormatterSettingConstants } from "../FormatterSettingConstants";
 
 export enum JavaFormatterSettingPanel {
 	WHITESPACE = "whiteSpace",
@@ -121,14 +122,14 @@ function initializeWhitespaceSettings(): JavaFormatterSetting[] {
 
 	const beforeBinaryOperatorSetting: JavaFormatterSetting = {
 		name: "Insert Whitespace Before Binary Operator",
-		id: "java.format.insertSpace.before.binaryOperator",
+		id: FormatterSettingConstants.BEFORE_BINARY_OPERATOR,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "true"
 	};
 
 	const afterBinaryOperatorSetting: JavaFormatterSetting = {
 		name: "Insert Whitespace After Binary Operator",
-		id: "java.format.insertSpace.after.binaryOperator",
+		id: FormatterSettingConstants.AFTER_BINARY_OPERATOR,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "true"
 	};
@@ -142,14 +143,14 @@ function initializeWhitespaceSettings(): JavaFormatterSetting[] {
 
 	const beforeCommaSetting: JavaFormatterSetting = {
 		name: "Insert Whitespace Before Comma",
-		id: "java.format.insertSpace.before.comma",
+		id: FormatterSettingConstants.BEFORE_COMMA,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "false"
 	};
 
 	const afterCommaSetting: JavaFormatterSetting = {
 		name: "Insert Whitespace After Comma",
-		id: "java.format.insertSpace.after.comma",
+		id: FormatterSettingConstants.AFTER_COMMA,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "true"
 	};
@@ -163,21 +164,21 @@ function initializeWhitespaceSettings(): JavaFormatterSetting[] {
 
 	const beforeClosingParenthesisSetting: JavaFormatterSetting = {
 		name: "Insert Whitespace Before Closing Parenthesis",
-		id: "java.format.insertSpace.before.closingParenthesis",
+		id: FormatterSettingConstants.BEFORE_CLOSING_PARENTHESIS,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "false"
 	};
 
 	const beforeOpeningParenthesisSetting: JavaFormatterSetting = {
 		name: "Insert Whitespace Before Opening Parenthesis",
-		id: "java.format.insertSpace.before.openingParenthesis.controlStatement",
+		id: FormatterSettingConstants.BEFORE_CLOSING_PARENTHESIS_CONTROL,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "true"
 	};
 
 	const afterOpeningParenthesisSetting: JavaFormatterSetting = {
 		name: "Insert Whitespace After Opening Parenthesis",
-		id: "java.format.insertSpace.after.openingParenthesis",
+		id: FormatterSettingConstants.AFTER_OPENING_PARENTHESIS,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "false"
 	};
@@ -191,7 +192,7 @@ function initializeWhitespaceSettings(): JavaFormatterSetting[] {
 
 	const beforeOpeningBraceSetting: JavaFormatterSetting = {
 		name: "Insert Whitespace Before Opening Brace",
-		id: "java.format.insertSpace.before.openingBrace",
+		id: FormatterSettingConstants.OPENING_BRACE,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "true"
 	};
