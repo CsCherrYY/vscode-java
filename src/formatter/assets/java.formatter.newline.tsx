@@ -11,21 +11,21 @@ import { CodePreviewPanel } from "./java.formatter.code";
 import { generateSettings } from "./utils";
 import { JavaFormatterSettingPanel } from "../FormatterSettingConstants";
 
-export interface WhitespaceSettingsProps {
+export interface NewlineSettingsProps {
 	filterValue: string;
-	whitespaceSettings?: JavaFormatterSetting[];
+	newlineSettings?: JavaFormatterSetting[];
 }
 
-export interface WhitespaceSettingsStates {
-	whitespaceSettings?: JavaFormatterSetting[];
+export interface NewlineSettingsStates {
+	newlineSettings?: JavaFormatterSetting[];
 }
 
-export class WhitespaceSettingsPanel extends React.Component<WhitespaceSettingsProps, WhitespaceSettingsStates> {
+export class NewlineSettingsPanel extends React.Component<NewlineSettingsProps, NewlineSettingsStates> {
 	child: any;
 
-	constructor(props: WhitespaceSettingsProps) {
+	constructor(props: NewlineSettingsProps) {
 		super(props);
-		this.state = { whitespaceSettings: props.whitespaceSettings };
+		this.state = { newlineSettings: props.newlineSettings };
 		window.addEventListener("message", event => {
 			if (event.data.command === "changeSettings") {
 				const element = document.getElementById(event.data.id);
@@ -41,7 +41,7 @@ export class WhitespaceSettingsPanel extends React.Component<WhitespaceSettingsP
 
 	private test: string = "class MyClass \{private int a = 0,b = 11,c = 2,d = 3;\nprivate int aa = -4 + -9;\nprivate int bb = aa++ / --number;\npublic void bar(int x, int y){}\n\}";
 
-	private whitespacePreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.WHITESPACE });
+	private NewlinePreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.NEWLINE });
 
 	render() {
 
@@ -50,16 +50,16 @@ export class WhitespaceSettingsPanel extends React.Component<WhitespaceSettingsP
 				<div className="row">
 					<div className="col-6">
 						<div className="row">
-							<h2 className="font-weight-light col-10">WhiteSpace</h2>
+							<h2 className="font-weight-light col-10">Newline</h2>
 							<div className="row">
 								<button id="btnCollapse" className="btn btn-link btn-sm" title="Collapse All" >Collapse All</button>
 							</div>
 						</div>
-						<div>{generateSettings(this.state.whitespaceSettings, this.props.filterValue)}</div>
+						<div>{generateSettings(this.state.newlineSettings, this.props.filterValue)}</div>
 					</div>
 					<div className="col-6">
 						<h2 className="font-weight-light">Preview</h2>
-						{this.whitespacePreviewPanel}
+						{this.NewlinePreviewPanel}
 					</div>
 				</div>
 			</div>

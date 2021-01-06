@@ -8,12 +8,6 @@ import "../css/vscode.scss";
 import { JavaFormatterPanel } from "./java.formatter";
 import { FormatterSettingConstants } from "../FormatterSettingConstants";
 
-export enum JavaFormatterSettingPanel {
-	WHITESPACE = "whiteSpace",
-	COMMENT = "comment",
-	WRAPPING = "wrapping",
-}
-
 export enum JavaFormatterSettingType {
 	BOOLEAN = "boolean",
 	NUMBER = "number",
@@ -33,9 +27,13 @@ export interface JavaFormatterSetting {
 
 function render() {
 	const props = {
+		commonSettings: initializeCommonSettings(),
+		indentationSettings: initializeIndentationSettings(),
 		whitespaceSettings: initializeWhitespaceSettings(),
 		commentSettings: initializeCommentSettings(),
 		wrappingSettings: initializeWrappingSettings(),
+		newlineSettings: initializeNewlineSettings(),
+		blanklineSettings: initializeBlanklineSettings(),
 	};
 
 	ReactDOM.render(React.createElement(JavaFormatterPanel, props), document.getElementById("formatterPanel"));
@@ -47,6 +45,49 @@ function render() {
 }
 
 render();
+
+function initializeCommonSettings(): JavaFormatterSetting[] {
+
+	const commonSettings: JavaFormatterSetting[] = [];
+
+	const tabulationTypeSetting: JavaFormatterSetting = {
+		name: "Tabulation Type",
+		id: FormatterSettingConstants.TABULATION_CHAR,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["tab", "space"],
+		defaultValue: "tab"
+	};
+
+	const tabulationSizeSetting: JavaFormatterSetting = {
+		name: "Tabulation Size",
+		id: FormatterSettingConstants.TABULATION_SIZE,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "4"
+	};
+
+	const eofSetting: JavaFormatterSetting = {
+		name: "Insert New Line At The End Of File",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_AT_THE_END_OF_FILE_IF_MISSING,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false"
+	};
+
+	commonSettings.push(...[tabulationTypeSetting, tabulationSizeSetting, eofSetting]);
+
+	return commonSettings;
+}
+
+function initializeIndentationSettings(): JavaFormatterSetting[] {
+	return undefined;
+}
+
+function initializeNewlineSettings(): JavaFormatterSetting[] {
+	return undefined;
+}
+
+function initializeBlanklineSettings(): JavaFormatterSetting[] {
+	return undefined;
+}
 
 function initializeWrappingSettings(): JavaFormatterSetting[] {
 

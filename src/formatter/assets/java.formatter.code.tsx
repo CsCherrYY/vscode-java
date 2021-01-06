@@ -5,8 +5,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
 import { formatCode } from "./vscode.api";
-import { JavaFormatterSettingPanel } from ".";
 import { CodeHighlight } from "./java.formatter.highlight";
+import { JavaFormatterSettingPanel } from "../FormatterSettingConstants";
 
 interface CodePreviewPanelProps {
 	code: string;
@@ -41,9 +41,9 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 		this.raw();
 	}
 
-	private handleChange = (event) => {
+	/*private handleChange = (event) => {
 		this.setState({ value: event.target.value });
-	}
+	}*/
 
 	public format() {
 		/*const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;

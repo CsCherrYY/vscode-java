@@ -1,4 +1,4 @@
-import { JavaFormatterSettingPanel } from ".";
+import { JavaFormatterSettingPanel } from "../FormatterSettingConstants";
 
 declare function acquireVsCodeApi(): any;
 const vscode = acquireVsCodeApi();

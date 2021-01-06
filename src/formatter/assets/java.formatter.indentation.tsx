@@ -11,21 +11,21 @@ import { CodePreviewPanel } from "./java.formatter.code";
 import { generateSettings } from "./utils";
 import { JavaFormatterSettingPanel } from "../FormatterSettingConstants";
 
-export interface WhitespaceSettingsProps {
+export interface IndentationSettingsProps {
 	filterValue: string;
-	whitespaceSettings?: JavaFormatterSetting[];
+	indentationSettings?: JavaFormatterSetting[];
 }
 
-export interface WhitespaceSettingsStates {
-	whitespaceSettings?: JavaFormatterSetting[];
+export interface IndentationSettingsStates {
+	indentationSettings?: JavaFormatterSetting[];
 }
 
-export class WhitespaceSettingsPanel extends React.Component<WhitespaceSettingsProps, WhitespaceSettingsStates> {
+export class IndentationSettingsPanel extends React.Component<IndentationSettingsProps, IndentationSettingsStates> {
 	child: any;
 
-	constructor(props: WhitespaceSettingsProps) {
+	constructor(props: IndentationSettingsProps) {
 		super(props);
-		this.state = { whitespaceSettings: props.whitespaceSettings };
+		this.state = { indentationSettings: props.indentationSettings };
 		window.addEventListener("message", event => {
 			if (event.data.command === "changeSettings") {
 				const element = document.getElementById(event.data.id);
@@ -41,7 +41,7 @@ export class WhitespaceSettingsPanel extends React.Component<WhitespaceSettingsP
 
 	private test: string = "class MyClass \{private int a = 0,b = 11,c = 2,d = 3;\nprivate int aa = -4 + -9;\nprivate int bb = aa++ / --number;\npublic void bar(int x, int y){}\n\}";
 
-	private whitespacePreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.WHITESPACE });
+	private IndentationPreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.INDENTATION });
 
 	render() {
 
@@ -50,16 +50,16 @@ export class WhitespaceSettingsPanel extends React.Component<WhitespaceSettingsP
 				<div className="row">
 					<div className="col-6">
 						<div className="row">
-							<h2 className="font-weight-light col-10">WhiteSpace</h2>
+							<h2 className="font-weight-light col-10">Indentation</h2>
 							<div className="row">
 								<button id="btnCollapse" className="btn btn-link btn-sm" title="Collapse All" >Collapse All</button>
 							</div>
 						</div>
-						<div>{generateSettings(this.state.whitespaceSettings, this.props.filterValue)}</div>
+						<div>{generateSettings(this.state.indentationSettings, this.props.filterValue)}</div>
 					</div>
 					<div className="col-6">
 						<h2 className="font-weight-light">Preview</h2>
-						{this.whitespacePreviewPanel}
+						{this.IndentationPreviewPanel}
 					</div>
 				</div>
 			</div>

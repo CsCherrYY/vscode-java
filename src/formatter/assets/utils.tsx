@@ -12,7 +12,7 @@ const handleChange = (e) => {
 	const value = e.target.value; // for value, string
 	const id = e.target.id;
 	const className = e.target.className;  // "form-control" or "form-check-input"
-	if (className === "form-control") { // enum
+	if (className === "form-control") { // enum, number
 		changeSetting(id, value);
 	} else if (className === "form-check-input") {
 		changeSetting(id, checked);
@@ -42,7 +42,7 @@ export function generateSettingsLeaf(setting: JavaFormatterSetting) {
 			return (
 				<div className="input-group mb-3">
 					<div className="input-group-prepend">
-						<label className="input-group-text" htmlFor="invisible">{setting.name}</label>
+						<label className="input-group-text" htmlFor="invisible">{setting.name}:</label>
 					</div>
 					<select className="form-control" id={setting.id} onChange={handleChange}>
 						{candidates}
@@ -50,7 +50,14 @@ export function generateSettingsLeaf(setting: JavaFormatterSetting) {
 				</div>
 			);
 		case JavaFormatterSettingType.NUMBER:
-			return;
+			return (
+				<div className="input-group mb-3">
+					<div className="input-group-prepend">
+						<span className="input-group-text" id="inputGroup-sizing-default">{setting.name}:</span>
+					</div>
+					<input type="text" className="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" id={setting.id} defaultValue={setting.defaultValue} onChange={handleChange}></input>
+				</div>
+			);
 		default:
 			return;
 	}
@@ -67,12 +74,12 @@ export function generateSettings(setting: JavaFormatterSetting[], filterValue?: 
 		if (!value.children) {
 			return this.generateSettingsLeaf(value);
 		} else {
-			const settings = this.generateSettings(value.children);
+			const settings = this.generateSettings(value.children, filterValue);
 			return (
-				<details>
-					<summary>{value.name}</summary>
-					{settings}
-				</details>
+					<details>
+						<summary>{value.name}</summary>
+						{settings}
+					</details>
 			);
 		}
 	});

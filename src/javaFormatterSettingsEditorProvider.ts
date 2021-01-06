@@ -6,6 +6,7 @@ import { join } from "path";
 import { CancellationToken, commands, CustomTextEditorProvider, ExtensionContext, Range, TextDocument, TextEdit, Uri, WebviewPanel, workspace, WorkspaceEdit } from "vscode";
 import { FormattingOptions } from "vscode-languageclient";
 import { Commands } from "./commands";
+import { FormatterSettingConstants, JavaFormatterSettingPanel } from "./formatter/FormatterSettingConstants";
 import { formatterSettingConverter } from "./formatter/FormatterSettingConverter";
 const xml2js = require('xml2js');
 export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProvider {
@@ -134,6 +135,22 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					}
 					const settingValue: string = formatterSettingConverter.valueConvert(e.id, e.value.toString());
 					this.changeFormatterSettings(document, settings, settingValue);
+					const idString: string = e.id as string;
+					let targetPanel: JavaFormatterSettingPanel;
+					if (idString.startsWith(FormatterSettingConstants.WHITESPACE_PREFIX)) {
+						targetPanel = JavaFormatterSettingPanel.WHITESPACE;
+					} else if (idString.startsWith(FormatterSettingConstants.WRAPPING_PREFIX)) {
+						targetPanel = JavaFormatterSettingPanel.WRAPPING;
+					} else if (idString.startsWith(FormatterSettingConstants.COMMENT_PREFIX)) {
+						targetPanel = JavaFormatterSettingPanel.COMMENT;
+					} else {
+						// No panel match
+						return;
+					}
+					webviewPanel.webview.postMessage({
+						command: "formatCode",
+						panel: targetPanel
+					});
 					break;
 				}
 				default:

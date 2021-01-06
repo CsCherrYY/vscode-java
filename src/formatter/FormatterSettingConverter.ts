@@ -8,23 +8,23 @@ class FormatterSettingConverter {
 	constructor() {
 		// clientValue, ServerValue[]
 		this.settingsMap.set(FormatterSettingConstants.AFTER_BINARY_OPERATOR, [
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_after_multiplicative_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_after_additive_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_after_string_concatenation`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_after_shift_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_after_relational_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_after_bitwise_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_after_logical_operator`
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_multiplicative_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_additive_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_string_concatenation`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_shift_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_relational_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_bitwise_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_logical_operator`
 		]);
 
 		this.settingsMap.set(FormatterSettingConstants.BEFORE_BINARY_OPERATOR, [
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_before_multiplicative_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_before_additive_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_before_string_concatenation`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_before_shift_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_before_relational_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_before_bitwise_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_PLUGIN_ID}.formatter.insert_space_before_logical_operator`
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_multiplicative_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_additive_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_string_concatenation`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_shift_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_relational_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_bitwise_operator`,
+			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_logical_operator`
 		]);
 	}
 

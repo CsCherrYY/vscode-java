@@ -4,9 +4,10 @@ import * as $ from "jquery";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
-import { JavaFormatterSetting, JavaFormatterSettingPanel } from ".";
+import { JavaFormatterSetting } from ".";
 import { CodePreviewPanel } from "./java.formatter.code";
 import { generateSettings } from "./utils";
+import { JavaFormatterSettingPanel } from "../FormatterSettingConstants";
 
 export interface CommentSettingsProps {
 	filterValue: string;
