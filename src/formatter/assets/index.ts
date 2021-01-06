@@ -6,7 +6,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
 import { JavaFormatterPanel } from "./java.formatter";
-import { FormatterSettingConstants } from "../FormatterSettingConstants";
+import { FormatterSettingConstants, JavaFormatterSettingPanel } from "../FormatterSettingConstants";
 
 export enum JavaFormatterSettingType {
 	BOOLEAN = "boolean",
@@ -21,6 +21,7 @@ export interface JavaFormatterSetting {
 	type?: JavaFormatterSettingType;
 	defaultValue?: string;
 	candidates?: string[];
+	panel?: JavaFormatterSettingPanel;
 	// For leaf node, children === undefined
 	children?: JavaFormatterSetting[];
 }
@@ -28,7 +29,6 @@ export interface JavaFormatterSetting {
 function render() {
 	const props = {
 		commonSettings: initializeCommonSettings(),
-		indentationSettings: initializeIndentationSettings(),
 		whitespaceSettings: initializeWhitespaceSettings(),
 		commentSettings: initializeCommentSettings(),
 		wrappingSettings: initializeWrappingSettings(),
@@ -55,21 +55,24 @@ function initializeCommonSettings(): JavaFormatterSetting[] {
 		id: FormatterSettingConstants.TABULATION_CHAR,
 		type: JavaFormatterSettingType.ENUM,
 		candidates: ["tab", "space"],
-		defaultValue: "tab"
+		defaultValue: "tab",
+		panel: JavaFormatterSettingPanel.COMMON
 	};
 
 	const tabulationSizeSetting: JavaFormatterSetting = {
 		name: "Tabulation Size",
 		id: FormatterSettingConstants.TABULATION_SIZE,
 		type: JavaFormatterSettingType.NUMBER,
-		defaultValue: "4"
+		defaultValue: "4",
+		panel: JavaFormatterSettingPanel.COMMON
 	};
 
 	const eofSetting: JavaFormatterSetting = {
 		name: "Insert New Line At The End Of File",
 		id: FormatterSettingConstants.INSERT_NEW_LINE_AT_THE_END_OF_FILE_IF_MISSING,
 		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "false"
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.COMMON
 	};
 
 	commonSettings.push(...[tabulationTypeSetting, tabulationSizeSetting, eofSetting]);
@@ -77,53 +80,271 @@ function initializeCommonSettings(): JavaFormatterSetting[] {
 	return commonSettings;
 }
 
-function initializeIndentationSettings(): JavaFormatterSetting[] {
-	return undefined;
-}
-
 function initializeNewlineSettings(): JavaFormatterSetting[] {
-	return undefined;
+
+	const newlineSettings: JavaFormatterSetting[] = [];
+
+	const inControlStatementSetting: JavaFormatterSetting = {
+		name: "In Control Statement",
+		id: "inControlStatement",
+	};
+
+	const beforeWhileInDoSetting: JavaFormatterSetting = {
+		name: "Insert New Line before 'while' in a 'do' statement",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_WHILE_IN_DO_STATEMENT,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const beforeFinallyInTrySetting: JavaFormatterSetting = {
+		name: "Insert New Line before 'finally' in a 'try' statement",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_FINALLY_IN_TRY_STATEMENT,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const beforeElseInIfSetting: JavaFormatterSetting = {
+		name: "Insert New Line before 'else' in a 'if' statement",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_ELSE_IN_IF_STATEMENT,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const beforeCatchInTrySetting: JavaFormatterSetting = {
+		name: "Insert New Line before 'catch' in a 'try' statement",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_CATCH_IN_TRY_STATEMENT,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	inControlStatementSetting.children = [beforeWhileInDoSetting, beforeFinallyInTrySetting,
+		beforeElseInIfSetting, beforeCatchInTrySetting];
+
+	const inArrayInitializerSetting: JavaFormatterSetting = {
+		name: "In Array Initializer",
+		id: "inArrayInitializer",
+	};
+
+	const beforeClosingBraceArrayInitializerSetting: JavaFormatterSetting = {
+		name: "Insert New Line before closing brace of array initializer",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_CLOSING_BRACE_IN_ARRAY_INITIALIZER,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const afterOpeningBraceArrayInitializerSetting: JavaFormatterSetting = {
+		name: "Insert New Line after opening brace of array initializer",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_AFTER_OPENING_BRACE_IN_ARRAY_INITIALIZER,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	inArrayInitializerSetting.children = [beforeClosingBraceArrayInitializerSetting, afterOpeningBraceArrayInitializerSetting];
+
+	const afterAnnotationSetting: JavaFormatterSetting = {
+		name: "After Annotation",
+		id: "afterAnnotation",
+	};
+
+	const afterAnnotationOnParameterSetting: JavaFormatterSetting = {
+		name: "Insert New Line after annotation on parameters",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_AFTER_ANNOTATION_ON_PARAMETER,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const afterAnnotationOnPackageSetting: JavaFormatterSetting = {
+		name: "Insert New Line after annotation on packages",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_AFTER_ANNOTATION_ON_PACKAGE,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const afterAnnotationOnEnunConstantSetting: JavaFormatterSetting = {
+		name: "Insert New Line after annotation on enum constants",
+		id: FormatterSettingConstants.INSERT_NEW_LINE_AFTER_ANNOTATION_ON_ENUM_CONSTANT,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	afterAnnotationSetting.children = [afterAnnotationOnParameterSetting, afterAnnotationOnPackageSetting,
+		afterAnnotationOnEnunConstantSetting];
+
+	const beforeEmptyStatementSetting: JavaFormatterSetting = {
+		name: "Insert New Line before empty statement",
+		id: FormatterSettingConstants.PUT_EMPTY_STATEMENT_ON_NEW_LINE,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const keepBracedCodeSetting: JavaFormatterSetting = {
+		name: "Keep Braced Code on One Line",
+		id: "keepBracedCodeonOneLine",
+	};
+
+	const newlineClassDeclarationSetting: JavaFormatterSetting = {
+		name: "New Line policy for class declaration",
+		id: FormatterSettingConstants.KEEP_TYPE_DECLARATION_ON_ONE_LINE,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["Never", "If empty", "If at most one item", "If fits in width limit", "Preserve state"],
+		defaultValue: "Never",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const newlineRecordDeclarationSetting: JavaFormatterSetting = {
+		name: "New Line policy for record declaration",
+		id: FormatterSettingConstants.KEEP_RECORD_DECLARATION_ON_ONE_LINE,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["Never", "If empty", "If at most one item", "If fits in width limit", "Preserve state"],
+		defaultValue: "Never",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const newlineRecordConstructorSetting: JavaFormatterSetting = {
+		name: "New Line policy for record constructor",
+		id: FormatterSettingConstants.KEEP_RECORD_CONSTRUCTOR_ON_ONE_LINE,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["Never", "If empty", "If at most one item", "If fits in width limit", "Preserve state"],
+		defaultValue: "Never",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const newlineMethodBodySetting: JavaFormatterSetting = {
+		name: "New Line policy for method body",
+		id: FormatterSettingConstants.KEEP_METHOD_BODY_ON_ONE_LINE,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["Never", "If empty", "If at most one item", "If fits in width limit", "Preserve state"],
+		defaultValue: "Never",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const newlineEnumDeclarationSetting: JavaFormatterSetting = {
+		name: "New Line policy for enum declaration",
+		id: FormatterSettingConstants.KEEP_ENUM_DECLARATION_ON_ONE_LINE,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["Never", "If empty", "If at most one item", "If fits in width limit", "Preserve state"],
+		defaultValue: "Never",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const newlineEnumConstantDeclarationSetting: JavaFormatterSetting = {
+		name: "New Line policy for enum constant declaration",
+		id: FormatterSettingConstants.KEEP_ENUM_CONSTANT_DECLARATION_ON_ONE_LINE,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["Never", "If empty", "If at most one item", "If fits in width limit", "Preserve state"],
+		defaultValue: "Never",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const newlineAnonymousTypeDeclarationSetting: JavaFormatterSetting = {
+		name: "New Line policy for anonymous type declaration",
+		id: FormatterSettingConstants.KEEP_ANONYMOUS_TYPE_DECLARATION_ON_ONE_LINE,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["Never", "If empty", "If at most one item", "If fits in width limit", "Preserve state"],
+		defaultValue: "Never",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	const newlineAnnotationDeclarationSetting: JavaFormatterSetting = {
+		name: "New Line policy for annotation declaration",
+		id: FormatterSettingConstants.KEEP_ANNOTATION_DECLARATION_ON_ONE_LINE,
+		type: JavaFormatterSettingType.ENUM,
+		candidates: ["Never", "If empty", "If at most one item", "If fits in width limit", "Preserve state"],
+		defaultValue: "Never",
+		panel: JavaFormatterSettingPanel.NEWLINE
+	};
+
+	keepBracedCodeSetting.children = [newlineClassDeclarationSetting, newlineRecordDeclarationSetting,
+		newlineRecordConstructorSetting, newlineMethodBodySetting, newlineEnumDeclarationSetting,
+		newlineEnumConstantDeclarationSetting, newlineAnonymousTypeDeclarationSetting, newlineAnnotationDeclarationSetting];
+
+	newlineSettings.push(...[inControlStatementSetting, inArrayInitializerSetting, afterAnnotationSetting, beforeEmptyStatementSetting, keepBracedCodeSetting]);
+	return newlineSettings;
 }
 
 function initializeBlanklineSettings(): JavaFormatterSetting[] {
-	return undefined;
+
+	const blanklineSettings: JavaFormatterSetting[] = [];
+
+	const blanklineBetweenTypeDeclarationSetting: JavaFormatterSetting = {
+		name: "Blank lines between type declarations",
+		id: FormatterSettingConstants.BLANK_LINES_BETWEEN_TYPE_DECLARATIONS,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "1",
+		panel: JavaFormatterSettingPanel.BLANKLINE
+	};
+
+	const blanklineBetweenInputGroupsSetting: JavaFormatterSetting = {
+		name: "Blank lines between input groups",
+		id: FormatterSettingConstants.BLANK_LINES_BETWEEN_IMPORT_GROUPS,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "1",
+		panel: JavaFormatterSettingPanel.BLANKLINE
+	};
+
+	const blanklineBeforePackageSetting: JavaFormatterSetting = {
+		name: "Blank lines before package",
+		id: FormatterSettingConstants.BLANK_LINES_BEFORE_PACKAGE,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "0",
+		panel: JavaFormatterSettingPanel.BLANKLINE
+	};
+
+	const blanklineBeforeMemberTypeSetting: JavaFormatterSetting = {
+		name: "Blank lines before member type",
+		id: FormatterSettingConstants.BLANK_LINES_BEFORE_MEMBER_TYPE,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "1",
+		panel: JavaFormatterSettingPanel.BLANKLINE
+	};
+
+	const blanklineBeforeImportsSetting: JavaFormatterSetting = {
+		name: "Blank lines before imports",
+		id: FormatterSettingConstants.BLANK_LINES_BEFORE_IMPORTS,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "1",
+		panel: JavaFormatterSettingPanel.BLANKLINE
+	};
+
+	const blanklinePreserveSetting: JavaFormatterSetting = {
+		name: "Preserve empty lines",
+		id: FormatterSettingConstants.NUMBER_OF_EMPTY_LINES_TO_PRESERVE,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "1",
+		panel: JavaFormatterSettingPanel.BLANKLINE
+	};
+
+	blanklineSettings.push(...[blanklineBetweenTypeDeclarationSetting,
+		blanklineBetweenInputGroupsSetting, blanklineBeforePackageSetting,
+		blanklineBeforeMemberTypeSetting, blanklineBeforeImportsSetting,
+		blanklinePreserveSetting]);
+
+	return blanklineSettings;
 }
 
 function initializeWrappingSettings(): JavaFormatterSetting[] {
 
 	const wrappingSettings: JavaFormatterSetting[] = [];
 
-	const bracePolicySetting: JavaFormatterSetting = {
-		name: "Brace Policy",
-		id: "java.format.insertLine.brace",
-		type: JavaFormatterSettingType.ENUM,
-		candidates: ["Same line", "Next line"],
-		defaultValue: "Same line"
+	const wrappingLinesplitSetting: JavaFormatterSetting = {
+		name: "Maximum line width",
+		id: FormatterSettingConstants.LINESPLIT,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "120",
+		panel: JavaFormatterSettingPanel.WRAPPING
 	};
 
-	const bracedCodeSetting: JavaFormatterSetting = {
-		name: "Braced Code",
-		id: "java.format.insertLine.bracedCode",
-		type: JavaFormatterSettingType.ENUM,
-		candidates: ["Never", "If empty", "If at most one item"],
-		defaultValue: "Never"
-	};
-
-	const newLineInControlStatementSetting: JavaFormatterSetting = {
-		name: "New Line in Control Statement",
-		id: "java.format.insertLine.controlStatement",
-		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "false"
-	};
-
-	const KeepSimpleInControlStatementSetting: JavaFormatterSetting = {
-		name: "Keep simple Control Statement",
-		id: "java.format.insertLine.controlStatement.keepSimple",
-		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "true"
-	};
-
-	wrappingSettings.push(...[bracePolicySetting, bracedCodeSetting, newLineInControlStatementSetting, KeepSimpleInControlStatementSetting]);
+	wrappingSettings.push(...[wrappingLinesplitSetting]);
 
 	return wrappingSettings;
 }
@@ -132,22 +353,82 @@ function initializeCommentSettings(): JavaFormatterSetting[] {
 
 	const commentSettings: JavaFormatterSetting[] = [];
 
-	const javadocAlignmentSetting: JavaFormatterSetting = {
-		name: "Javadoc Alignment",
-		id: "java.format.comments.javadoc.alignment",
-		type: JavaFormatterSettingType.ENUM,
-		candidates: ["Align names and descriptions", "Align descriptions, grouped by type", "Align descriptions to tag width", "Don’t align"],
-		defaultValue: "Align descriptions, grouped by type"
+	const commentLineLengthSetting: JavaFormatterSetting = {
+		name: "Maximum comment width",
+		id: FormatterSettingConstants.COMMENT_LINE_LENGTH,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "80",
+		panel: JavaFormatterSettingPanel.COMMENT
 	};
 
-	const offOnTagsSetting: JavaFormatterSetting = {
-		name: "Use Off/On Tags",
-		id: "java.format.comments.offOnTag",
+	const commentIndentParameterDescriptionSetting: JavaFormatterSetting = {
+		name: "Indent wrapped parameter description",
+		id: FormatterSettingConstants.COMMENT_INDENT_PARAMETER_DESCRIPTION,
 		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "false"
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.COMMENT
 	};
 
-	commentSettings.push(...[javadocAlignmentSetting, offOnTagsSetting]);
+	const commentHeaderCommentSetting: JavaFormatterSetting = {
+		name: "Enable header comment formatting",
+		id: FormatterSettingConstants.COMMENT_FORMAT_HEADER,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.COMMENT
+	};
+
+	const commentBlockCommentSetting: JavaFormatterSetting = {
+		name: "Enable block comment formatting",
+		id: FormatterSettingConstants.COMMENT_FORMAT_BLOCK_COMMENTS,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.COMMENT
+	};
+
+	const commentLengthFromStartingSetting: JavaFormatterSetting = {
+		name: "Count line length from comment's starting position",
+		id: FormatterSettingConstants.COMMENT_COUNT_LINE_LENGTH_FROM_STARTING_POSITION,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.COMMENT
+	};
+
+	const commentRemoveBlanklinesInJavadocSetting: JavaFormatterSetting = {
+		name: "Remove blank lines in Javadoc",
+		id: FormatterSettingConstants.COMMENT_CLEAR_BLANK_LINES_IN_JAVADOC_COMMENT,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.COMMENT
+	};
+
+	const commentRemoveBlanklinesInBlockSetting: JavaFormatterSetting = {
+		name: "Remove blank lines in block comment",
+		id: FormatterSettingConstants.COMMENT_CLEAR_BLANK_LINES_IN_BLOCK_COMMENT,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.COMMENT
+	};
+
+	const commentOnOffTagsSetting: JavaFormatterSetting = {
+		name: "Use On/Off tags",
+		id: FormatterSettingConstants.COMMENT_ON_OFF_TAGS,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.COMMENT
+	};
+
+	const commentFirstColumnSetting: JavaFormatterSetting = {
+		name: "Format line comments on first column",
+		id: FormatterSettingConstants.FORMAT_LINE_COMMENT_STARTING_ON_FIRST_COLUMN,
+		type: JavaFormatterSettingType.BOOLEAN,
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.COMMENT
+	};
+
+	commentSettings.push(...[commentLineLengthSetting, commentIndentParameterDescriptionSetting,
+		commentHeaderCommentSetting, commentBlockCommentSetting, commentLengthFromStartingSetting,
+		commentRemoveBlanklinesInJavadocSetting, commentRemoveBlanklinesInBlockSetting,
+		commentOnOffTagsSetting, commentFirstColumnSetting]);
 
 	return commentSettings;
 }
@@ -156,91 +437,61 @@ function initializeWhitespaceSettings(): JavaFormatterSetting[] {
 
 	const whitespaceSettings: JavaFormatterSetting[] = [];
 
-	const operatorSetting: JavaFormatterSetting = {
-		name: "Operator",
-		id: "operator",
-	};
-
-	const beforeBinaryOperatorSetting: JavaFormatterSetting = {
-		name: "Insert Whitespace Before Binary Operator",
-		id: FormatterSettingConstants.BEFORE_BINARY_OPERATOR,
+	const whitespaceBeforeClosingBraceInArrayInitializerSetting: JavaFormatterSetting = {
+		name: "Insert whitespace before closing brace in array initializer",
+		id: FormatterSettingConstants.INSERT_SPACE_BEFORE_CLOSING_BRACE_IN_ARRAY_INITIALIZER,
 		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "true"
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.WHITESPACE
 	};
 
-	const afterBinaryOperatorSetting: JavaFormatterSetting = {
-		name: "Insert Whitespace After Binary Operator",
-		id: FormatterSettingConstants.AFTER_BINARY_OPERATOR,
+	const whitespaceBeforeAtInAnnotationTypeDeclarationSetting: JavaFormatterSetting = {
+		name: "Insert whitespace before at in annotation type declaration",
+		id: FormatterSettingConstants.INSERT_SPACE_BEFORE_AT_IN_ANNOTATION_TYPE_DECLARATION,
 		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "true"
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.WHITESPACE
 	};
 
-	operatorSetting.children = [beforeBinaryOperatorSetting, afterBinaryOperatorSetting];
-
-	const commaSetting: JavaFormatterSetting = {
-		name: "Comma",
-		id: "comma",
-	};
-
-	const beforeCommaSetting: JavaFormatterSetting = {
-		name: "Insert Whitespace Before Comma",
-		id: FormatterSettingConstants.BEFORE_COMMA,
+	const whitespaceAfterOpeningBraceInArrayInitializerSetting: JavaFormatterSetting = {
+		name: "Insert whitespace after opening brace in array initializer",
+		id: FormatterSettingConstants.INSERT_SPACE_AFTER_OPENING_BRACE_IN_ARRAY_INITIALIZER,
 		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "false"
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.WHITESPACE
 	};
 
-	const afterCommaSetting: JavaFormatterSetting = {
-		name: "Insert Whitespace After Comma",
-		id: FormatterSettingConstants.AFTER_COMMA,
+	const whitespaceAfterColonInCaseSetting: JavaFormatterSetting = {
+		name: "Insert whitespace after colon in case",
+		id: FormatterSettingConstants.INSERT_SPACE_AFTER_COLON_IN_CASE,
 		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "true"
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.WHITESPACE
 	};
 
-	commaSetting.children = [beforeCommaSetting, afterCommaSetting];
-
-	const parenthesisSetting: JavaFormatterSetting = {
-		name: "Parenthesis",
-		id: "parenthesis",
-	};
-
-	const beforeClosingParenthesisSetting: JavaFormatterSetting = {
-		name: "Insert Whitespace Before Closing Parenthesis",
-		id: FormatterSettingConstants.BEFORE_CLOSING_PARENTHESIS,
+	const whitespaceAfterClosingParenthesisInCastSetting: JavaFormatterSetting = {
+		name: "Insert whitespace after closing parenthesis in cast",
+		id: FormatterSettingConstants.INSERT_SPACE_AFTER_CLOSING_PAREN_IN_CAST,
 		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "false"
+		defaultValue: "true",
+		panel: JavaFormatterSettingPanel.WHITESPACE
 	};
 
-	const beforeOpeningParenthesisSetting: JavaFormatterSetting = {
-		name: "Insert Whitespace Before Opening Parenthesis",
-		id: FormatterSettingConstants.BEFORE_CLOSING_PARENTHESIS_CONTROL,
+	const whitespaceAfterClosingAngleBracketInTypeArgumentsSetting: JavaFormatterSetting = {
+		name: "Insert whitespace after closing angle bracket in type arguments",
+		id: FormatterSettingConstants.INSERT_SPACE_AFTER_CLOSING_ANGLE_BRACKET_IN_TYPE_ARGUMENTS,
 		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "true"
+		defaultValue: "false",
+		panel: JavaFormatterSettingPanel.WHITESPACE
 	};
 
-	const afterOpeningParenthesisSetting: JavaFormatterSetting = {
-		name: "Insert Whitespace After Opening Parenthesis",
-		id: FormatterSettingConstants.AFTER_OPENING_PARENTHESIS,
-		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "false"
-	};
-
-	parenthesisSetting.children = [beforeClosingParenthesisSetting, beforeOpeningParenthesisSetting, afterOpeningParenthesisSetting];
-
-	const bracesSetting: JavaFormatterSetting = {
-		name: "Brace",
-		id: "brace",
-	};
-
-	const beforeOpeningBraceSetting: JavaFormatterSetting = {
-		name: "Insert Whitespace Before Opening Brace",
-		id: FormatterSettingConstants.OPENING_BRACE,
-		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "true"
-	};
-
-	bracesSetting.children = [beforeOpeningBraceSetting];
-
-	whitespaceSettings.push(...[operatorSetting, commaSetting, parenthesisSetting, bracesSetting]);
+	whitespaceSettings.push(...[whitespaceBeforeClosingBraceInArrayInitializerSetting,
+		whitespaceBeforeAtInAnnotationTypeDeclarationSetting,
+		whitespaceAfterOpeningBraceInArrayInitializerSetting,
+		whitespaceAfterColonInCaseSetting,
+		whitespaceAfterClosingParenthesisInCastSetting,
+		whitespaceAfterClosingAngleBracketInTypeArgumentsSetting
+	]);
 
 	return whitespaceSettings;
 }

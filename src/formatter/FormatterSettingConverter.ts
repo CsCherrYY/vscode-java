@@ -7,36 +7,31 @@ class FormatterSettingConverter {
 
 	constructor() {
 		// clientValue, ServerValue[]
-		this.settingsMap.set(FormatterSettingConstants.AFTER_BINARY_OPERATOR, [
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_multiplicative_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_additive_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_string_concatenation`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_shift_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_relational_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_bitwise_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_after_logical_operator`
-		]);
-
-		this.settingsMap.set(FormatterSettingConstants.BEFORE_BINARY_OPERATOR, [
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_multiplicative_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_additive_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_string_concatenation`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_shift_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_relational_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_bitwise_operator`,
-			`${FormatterSettingConstants.JAVA_CORE_FORMATTER_ID}.insert_space_before_logical_operator`
-		]);
 	}
 
-	public convert(setting: string): string[] | undefined {
-		return this.settingsMap.get(setting);
+	public convert(setting: string): string | undefined {
+		//return this.settingsMap.get(setting);
+		return setting;
 	}
 
 	public valueConvert(setting: string, value: string): string {
 		let valueString: string;
 		switch (setting) {
-			case FormatterSettingConstants.AFTER_BINARY_OPERATOR:
-			case FormatterSettingConstants.BEFORE_BINARY_OPERATOR:
+			case FormatterSettingConstants.INSERT_SPACE_AFTER_CLOSING_ANGLE_BRACKET_IN_TYPE_ARGUMENTS:
+			case FormatterSettingConstants.INSERT_SPACE_AFTER_CLOSING_PAREN_IN_CAST:
+			case FormatterSettingConstants.INSERT_SPACE_AFTER_COLON_IN_CASE:
+			case FormatterSettingConstants.INSERT_SPACE_AFTER_OPENING_BRACE_IN_ARRAY_INITIALIZER:
+			case FormatterSettingConstants.INSERT_SPACE_BEFORE_AT_IN_ANNOTATION_TYPE_DECLARATION:
+			case FormatterSettingConstants.INSERT_SPACE_BEFORE_CLOSING_BRACE_IN_ARRAY_INITIALIZER:
+			case FormatterSettingConstants.INSERT_NEW_LINE_AFTER_ANNOTATION_ON_ENUM_CONSTANT:
+			case FormatterSettingConstants.INSERT_NEW_LINE_AFTER_ANNOTATION_ON_PACKAGE:
+			case FormatterSettingConstants.INSERT_NEW_LINE_AFTER_ANNOTATION_ON_PARAMETER:
+			case FormatterSettingConstants.INSERT_NEW_LINE_AFTER_OPENING_BRACE_IN_ARRAY_INITIALIZER:
+			case FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_CATCH_IN_TRY_STATEMENT:
+			case FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_CLOSING_BRACE_IN_ARRAY_INITIALIZER:
+			case FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_ELSE_IN_IF_STATEMENT:
+			case FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_FINALLY_IN_TRY_STATEMENT:
+			case FormatterSettingConstants.INSERT_NEW_LINE_BEFORE_WHILE_IN_DO_STATEMENT:
 				valueString = (value === "true") ? "insert" : "do not insert";
 				break;
 		}

@@ -27,8 +27,8 @@ export function generateSettingsLeaf(setting: JavaFormatterSetting) {
 		case JavaFormatterSettingType.BOOLEAN:
 			return (
 				<div className="form-check">
-					<input type="checkbox" className="form-check-input" id={setting.id} defaultChecked={(setting.defaultValue === "true")} onChange={handleChange}></input>
-					<label className="form-check-label" htmlFor={setting.id}>{setting.name}</label>
+					<input type="checkbox" className="form-check-input" id={`${setting.panel}|${setting.id}`} defaultChecked={(setting.defaultValue === "true")} onChange={handleChange}></input>
+					<label className="form-check-label" htmlFor={`${setting.panel}|${setting.id}`}>{setting.name}</label>
 				</div>
 			);
 		case JavaFormatterSettingType.ENUM:
@@ -44,7 +44,7 @@ export function generateSettingsLeaf(setting: JavaFormatterSetting) {
 					<div className="input-group-prepend">
 						<label className="input-group-text" htmlFor="invisible">{setting.name}:</label>
 					</div>
-					<select className="form-control" id={setting.id} onChange={handleChange}>
+					<select className="form-control" id={`${setting.panel}|${setting.id}`} onChange={handleChange}>
 						{candidates}
 					</select>
 				</div>
@@ -55,7 +55,7 @@ export function generateSettingsLeaf(setting: JavaFormatterSetting) {
 					<div className="input-group-prepend">
 						<span className="input-group-text" id="inputGroup-sizing-default">{setting.name}:</span>
 					</div>
-					<input type="text" className="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" id={setting.id} defaultValue={setting.defaultValue} onChange={handleChange}></input>
+					<input type="text" className="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" id={`${setting.panel}|${setting.id}`} defaultValue={setting.defaultValue} onChange={handleChange}></input>
 				</div>
 			);
 		default:

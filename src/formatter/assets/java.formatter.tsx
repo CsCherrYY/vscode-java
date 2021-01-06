@@ -9,13 +9,11 @@ import { WrappingSettingsPanel } from "./java.formatter.wrapping";
 import { importSettings } from "./vscode.api";
 import { WhitespaceSettingsPanel } from "./java.formatter.whitespace";
 import { CommonSettingsPanel } from "./java.formatter.common";
-import { IndentationSettingsPanel } from "./java.formatter.indentation";
 import { NewlineSettingsPanel } from "./java.formatter.newline";
 import { BlanklineSettingsPanel } from "./java.formatter.blankline";
 
 interface JavaFormatterPanelProps {
 	commonSettings?: JavaFormatterSetting[];
-	indentationSettings?: JavaFormatterSetting[];
 	whitespaceSettings?: JavaFormatterSetting[];
 	commentSettings?: JavaFormatterSetting[];
 	wrappingSettings?: JavaFormatterSetting[];
@@ -52,7 +50,6 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps,
 		const commentSettingsPanel = React.createElement(CommentSettingsPanel, {commentSettings: this.props.commentSettings, filterValue: this.state.filterValue});
 		const wrappingSettingsPanel = React.createElement(WrappingSettingsPanel, {wrappingSettings: this.props.wrappingSettings, filterValue: this.state.filterValue});
 		const commonSettingsPanel = React.createElement(CommonSettingsPanel, {commonSettings: this.props.commonSettings, filterValue: this.state.filterValue});
-		const indentationSettingsPanel = React.createElement(IndentationSettingsPanel, {indentationSettings: this.props.indentationSettings, filterValue: this.state.filterValue});
 		const newlineSettingsPanel = React.createElement(NewlineSettingsPanel, {newlineSettings: this.props.newlineSettings, filterValue: this.state.filterValue});
 		const blanklineSettingsPanel = React.createElement(BlanklineSettingsPanel, {blanklineSettings: this.props.blanklineSettings, filterValue: this.state.filterValue});
 
@@ -90,10 +87,6 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps,
 									role="tab" aria-controls="common-panel" aria-selected="false" title="">Common</a>
 							</li>
 							<li className="nav-item">
-								<a className="nav-link" id="indentation-tab" data-toggle="tab" href="#indentation-panel"
-									role="tab" aria-controls="indentation-panel" aria-selected="false" title="">Indentation</a>
-							</li>
-							<li className="nav-item">
 								<a className="nav-link" id="whitespace-tab" data-toggle="tab" href="#whitespace-panel"
 									role="tab" aria-controls="whitespace-panel" aria-selected="false" title="">Whitespace</a>
 							</li>
@@ -123,12 +116,6 @@ export class JavaFormatterPanel extends React.Component<JavaFormatterPanelProps,
 								aria-labelledby="common-tab">
 								<div className="row" id="commonSettingsPanel">
 									{commonSettingsPanel}
-								</div>
-							</div>
-							<div className="tab-pane fade" id="indentation-panel" role="tabpanel"
-								aria-labelledby="indentation-tab">
-								<div className="row" id="indentationSettingsPanel">
-									{indentationSettingsPanel}
 								</div>
 							</div>
 							<div className="tab-pane fade" id="whitespace-panel" role="tabpanel"

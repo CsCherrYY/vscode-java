@@ -19,22 +19,6 @@ export namespace FormatterSettingConstants {
 
 	export const WRAPPING_PREFIX = "java.format.wrapping";
 
-	export const BEFORE_BINARY_OPERATOR = `${WHITESPACE_PREFIX}.before.binaryOperator`;
-
-	export const AFTER_BINARY_OPERATOR = `${WHITESPACE_PREFIX}.after.binaryOperator`;
-
-	export const BEFORE_COMMA = `${WHITESPACE_PREFIX}.before.comma`;
-
-	export const AFTER_COMMA = `${WHITESPACE_PREFIX}.after.comma`;
-
-	export const BEFORE_CLOSING_PARENTHESIS = `${WHITESPACE_PREFIX}.before.closingParenthesis`;
-
-	export const BEFORE_CLOSING_PARENTHESIS_CONTROL = `${WHITESPACE_PREFIX}.before.openingParenthesis.controlStatement`;
-
-	export const AFTER_OPENING_PARENTHESIS = `${WHITESPACE_PREFIX}.after.openingParenthesis`;
-
-	export const OPENING_BRACE = `${WHITESPACE_PREFIX}.before.openingBrace`;
-
 	// Different Settings between popular profiles
 
 	// Common (Inherit from VS Code)

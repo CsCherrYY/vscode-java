@@ -24,7 +24,7 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 		super(props);
 		this.state = {
 			value: props.code,
-			highlightedCode: props.code,
+			highlightedCode: props.code + "\n\n\n\n\n",
 			lastStepIsFormat: false,
 		};
 		window.addEventListener("message", event => {
@@ -63,7 +63,7 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 	}
 
 	public updateCode(code: string) {
-		this.setState({ highlightedCode: code });
+		this.setState({ highlightedCode: code + "\n\n\n\n\n" });
 	}
 
 	render() {

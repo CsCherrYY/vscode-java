@@ -19,7 +19,7 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 		this.storagePath = storagePath;
 	}
 
-	private async changeFormatterSettings(document: TextDocument, targetSettings: string[], settingValue: string): Promise<any> {
+	private async changeFormatterSettings(document: TextDocument, targetSetting: string, settingValue: string): Promise<any> {
 		const text: string = document.getText();
 		if (text.trim().length === 0) {
 			return;
@@ -28,10 +28,8 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 			const result = await xml2js.parseStringPromise(text);
 			if (result.profiles.profile.length === 1) {
 				for (const setting of result.profiles.profile[0].setting) {
-					for (const targetSetting of targetSettings) {
-						if (setting.$.id === targetSetting) {
-							setting.$.value = settingValue;
-						}
+					if (setting.$.id === targetSetting) {
+						setting.$.value = settingValue;
 					}
 				}
 			}
@@ -129,23 +127,38 @@ export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProv
 					commands.executeCommand(Commands.IMPORT_ECLIPSE_PROFILE);
 				}
 				case "changeSetting": {
-					const settings: string[] = formatterSettingConverter.convert(e.id);
+					let settings: string = formatterSettingConverter.convert(e.id);
 					if (!settings) {
 						return;
 					}
-					const settingValue: string = formatterSettingConverter.valueConvert(e.id, e.value.toString());
+					const settingsDivide: string[] = settings.split('|');
+					const group = settingsDivide[0];
+					settings = settingsDivide[settingsDivide.length - 1];
+					const settingValue: string = formatterSettingConverter.valueConvert(settings, e.value.toString());
 					this.changeFormatterSettings(document, settings, settingValue);
 					const idString: string = e.id as string;
-					let targetPanel: JavaFormatterSettingPanel;
-					if (idString.startsWith(FormatterSettingConstants.WHITESPACE_PREFIX)) {
-						targetPanel = JavaFormatterSettingPanel.WHITESPACE;
-					} else if (idString.startsWith(FormatterSettingConstants.WRAPPING_PREFIX)) {
-						targetPanel = JavaFormatterSettingPanel.WRAPPING;
-					} else if (idString.startsWith(FormatterSettingConstants.COMMENT_PREFIX)) {
-						targetPanel = JavaFormatterSettingPanel.COMMENT;
-					} else {
-						// No panel match
-						return;
+					let targetPanel: string;
+					switch (group) {
+						case JavaFormatterSettingPanel.WHITESPACE:
+							targetPanel = JavaFormatterSettingPanel.WHITESPACE;
+							break;
+						case JavaFormatterSettingPanel.BLANKLINE:
+							targetPanel = JavaFormatterSettingPanel.BLANKLINE;
+							break;
+						case JavaFormatterSettingPanel.COMMENT:
+							targetPanel = JavaFormatterSettingPanel.COMMENT;
+							break;
+						case JavaFormatterSettingPanel.NEWLINE:
+							targetPanel = JavaFormatterSettingPanel.NEWLINE;
+							break;
+						case JavaFormatterSettingPanel.COMMON:
+							targetPanel = JavaFormatterSettingPanel.COMMON;
+							break;
+						case JavaFormatterSettingPanel.WRAPPING:
+							targetPanel = JavaFormatterSettingPanel.WRAPPING;
+							break;
+						default:
+							return;
 					}
 					webviewPanel.webview.postMessage({
 						command: "formatCode",
