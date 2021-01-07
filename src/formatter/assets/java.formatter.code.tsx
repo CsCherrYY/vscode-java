@@ -24,7 +24,7 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 		super(props);
 		this.state = {
 			value: props.code,
-			highlightedCode: props.code + "\n\n\n\n\n",
+			highlightedCode: props.code,
 			lastStepIsFormat: false,
 		};
 		window.addEventListener("message", event => {
@@ -46,24 +46,17 @@ export class CodePreviewPanel extends React.Component<CodePreviewPanelProps, Cod
 	}*/
 
 	public format() {
-		/*const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;
-		element.readOnly = true;
-		if (!this.state.lastStepIsFormat) {
-			this.setState({ code: this.state.value });
-		}*/
 		formatCode(this.state.value, this.props.panel, true);
 		this.setState({ lastStepIsFormat: true });
 	}
 
 	private raw() {
-		/*const element: HTMLTextAreaElement = document.getElementById("noter-text-area") as HTMLTextAreaElement;
-		element.readOnly = false;*/
 		formatCode(this.state.value, this.props.panel, false);
 		this.setState({ lastStepIsFormat: false });
 	}
 
 	public updateCode(code: string) {
-		this.setState({ highlightedCode: code + "\n\n\n\n\n" });
+		this.setState({ highlightedCode: code });
 	}
 
 	render() {

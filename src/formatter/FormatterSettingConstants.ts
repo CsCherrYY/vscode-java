@@ -11,7 +11,7 @@ export enum JavaFormatterSettingPanel {
 }
 export namespace FormatterSettingConstants {
 
-	export const JAVA_CORE_FORMATTER_ID = "org.eclipse.jdt.core";
+	export const JAVA_CORE_FORMATTER_ID = "org.eclipse.jdt.core.formatter";
 
 	export const WHITESPACE_PREFIX = "java.format.whiteSpace";
 
@@ -24,6 +24,8 @@ export namespace FormatterSettingConstants {
 	// Common (Inherit from VS Code)
 
 	export const TABULATION_SIZE = `${JAVA_CORE_FORMATTER_ID}.tabulation.size`;
+
+	export const INDENTATION_SIZE = `${JAVA_CORE_FORMATTER_ID}.indentation.size`;
 
 	export const TABULATION_CHAR = `${JAVA_CORE_FORMATTER_ID}.tabulation.char`;
 
@@ -43,8 +45,6 @@ export namespace FormatterSettingConstants {
 	export const INSERT_SPACE_BEFORE_AT_IN_ANNOTATION_TYPE_DECLARATION = `${JAVA_CORE_FORMATTER_ID}.insert_space_before_at_in_annotation_type_declaration`;
 
 	export const INSERT_SPACE_AFTER_OPENING_BRACE_IN_ARRAY_INITIALIZER = `${JAVA_CORE_FORMATTER_ID}.insert_space_after_opening_brace_in_array_initializer`;
-
-	export const INSERT_SPACE_AFTER_COLON_IN_CASE = `${JAVA_CORE_FORMATTER_ID}.insert_space_after_colon_in_case`;
 
 	export const INSERT_SPACE_AFTER_CLOSING_PAREN_IN_CAST = `${JAVA_CORE_FORMATTER_ID}.insert_space_after_closing_paren_in_cast`;
 

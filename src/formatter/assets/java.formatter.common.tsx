@@ -39,7 +39,7 @@ export class CommonSettingsPanel extends React.Component<CommonSettingsProps, Co
 		});
 	}
 
-	private test: string = "class MyClass \{private int a = 0,b = 11,c = 2,d = 3;\nprivate int aa = -4 + -9;\nprivate int bb = aa++ / --number;\npublic void bar(int x, int y){}\n\}";
+	private test: string = `class Example \{\n\tint[] myArray = { 1, 2, 3, 4, 5, 6 };\n\tString stringWithTabs = "1\t2\t3\t4";\n\tpublic void bar(int x, int y){}\n\}`;
 
 	private CommonPreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.COMMON });
 

@@ -39,7 +39,7 @@ export class BlanklineSettingsPanel extends React.Component<BlanklineSettingsPro
 		});
 	}
 
-	private test: string = "class MyClass \{private int a = 0,b = 11,c = 2,d = 3;\nprivate int aa = -4 + -9;\nprivate int bb = aa++ / --number;\npublic void bar(int x, int y){}\n\}";
+	private test: string = `package foo.bar.baz;\n\n/* example comment */\n\nimport java.util.List;\nimport java.util.Arrays;\n\nimport org.eclipse.jdt.core.dom.ASTParser;\n\npublic class Example {\n\tpublic interface ExampleProvider {\n\t\tExample getExample();\n\n\t\tList<Example> getManyExamples();\n\t}\n}`;
 
 	private BlanklinePreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.BLANKLINE });
 

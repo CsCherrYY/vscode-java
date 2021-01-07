@@ -39,7 +39,7 @@ export class NewlineSettingsPanel extends React.Component<NewlineSettingsProps, 
 		});
 	}
 
-	private test: string = "class MyClass \{private int a = 0,b = 11,c = 2,d = 3;\nprivate int aa = -4 + -9;\nprivate int bb = aa++ / --number;\npublic void bar(int x, int y){}\n\}";
+	private test: string = `@Deprecated class MyClass \{\n\tstatic int[] fArray	= {1, 2, 3, 4, 5 };\n\t@Deprecated void foo() {\n\t\tdo {\n\t\t} while (true);\n\t\ttry {\n\t\t} catch (Exception e) {\n\t\t} finally {\n\t\t}\n\t\tif (true) {\n\t\t\treturn;\n\t\t} else if (false) {\n\t\t\treturn;\n\t\t}\n\t\t;;\n\t\}\n\tvoid empty(@SuppressWarnings("unused") final int i) {\n\t}\n\}`;
 
 	private NewlinePreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.NEWLINE });
 

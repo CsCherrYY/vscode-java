@@ -15,11 +15,10 @@ class FormatterSettingConverter {
 	}
 
 	public valueConvert(setting: string, value: string): string {
-		let valueString: string;
+		let valueString: string = value;
 		switch (setting) {
 			case FormatterSettingConstants.INSERT_SPACE_AFTER_CLOSING_ANGLE_BRACKET_IN_TYPE_ARGUMENTS:
 			case FormatterSettingConstants.INSERT_SPACE_AFTER_CLOSING_PAREN_IN_CAST:
-			case FormatterSettingConstants.INSERT_SPACE_AFTER_COLON_IN_CASE:
 			case FormatterSettingConstants.INSERT_SPACE_AFTER_OPENING_BRACE_IN_ARRAY_INITIALIZER:
 			case FormatterSettingConstants.INSERT_SPACE_BEFORE_AT_IN_ANNOTATION_TYPE_DECLARATION:
 			case FormatterSettingConstants.INSERT_SPACE_BEFORE_CLOSING_BRACE_IN_ARRAY_INITIALIZER:

@@ -4,7 +4,8 @@ import * as $ from "jquery";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import "../css/vscode.scss";
-import { JavaFormatterSetting } from ".";
+import { JavaFormatterSetting, JavaFormatterSettingType } from ".";
+import { formatCode } from "./vscode.api";
 import { CodePreviewPanel } from "./java.formatter.code";
 import { generateSettings } from "./utils";
 import { JavaFormatterSettingPanel } from "../FormatterSettingConstants";
@@ -14,11 +15,12 @@ export interface CommentSettingsProps {
 	commentSettings?: JavaFormatterSetting[];
 }
 
-export interface CommentSettingsState {
+export interface CommentSettingsStates {
 	commentSettings?: JavaFormatterSetting[];
 }
 
-export class CommentSettingsPanel extends React.Component<CommentSettingsProps, CommentSettingsState> {
+export class CommentSettingsPanel extends React.Component<CommentSettingsProps, CommentSettingsStates> {
+	child: any;
 
 	constructor(props: CommentSettingsProps) {
 		super(props);
@@ -36,28 +38,27 @@ export class CommentSettingsPanel extends React.Component<CommentSettingsProps, 
 		});
 	}
 
-	private test: string = "class MyClass \{\n\t/**\n\t * Descriptions of parameters and return values\n\
-\t * are best appended at end of the javadoc\n\
-\t * comment.\n\
-\t * @param x The first parameter. For an\n\
-\t * optimum result, this should be an odd\n\
-\t * number between 0 and 100.\n\
-\t */\n\
-\t public int foo(int first, int second){\n\t \tthrows Exception;}\n\}";
+	private test: string = `class MyClass \{\n\t/**\n\t * Descriptions of parameters and return values\n\t * are best appended at end of the javadoc\n\t * comment.\n\t * @param x The first parameter. For an\n\t * optimum result, this should be an odd\n\t * number between 0 and 100.\n\t */\n\t public int foo(int first, int second){\n\t \tthrows Exception;}\n\}`;
 
-	private commentPreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.COMMENT });
+	private CommentPreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.COMMENT });
 
 	render() {
+
 		return (
 			<div className="col">
 				<div className="row">
 					<div className="col-6">
-						<h2 className="font-weight-light">Comment</h2>
-						{generateSettings(this.props.commentSettings, this.props.filterValue)}
+						<div className="row">
+							<h2 className="font-weight-light col-10">Comment</h2>
+							<div className="row">
+								<button id="btnCollapse" className="btn btn-link btn-sm" title="Collapse All" >Collapse All</button>
+							</div>
+						</div>
+						<div>{generateSettings(this.state.commentSettings, this.props.filterValue)}</div>
 					</div>
 					<div className="col-6">
 						<h2 className="font-weight-light">Preview</h2>
-						{this.commentPreviewPanel}
+						{this.CommentPreviewPanel}
 					</div>
 				</div>
 			</div>

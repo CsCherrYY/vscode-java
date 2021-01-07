@@ -54,8 +54,8 @@ function initializeCommonSettings(): JavaFormatterSetting[] {
 		name: "Tabulation Type",
 		id: FormatterSettingConstants.TABULATION_CHAR,
 		type: JavaFormatterSettingType.ENUM,
-		candidates: ["tab", "space"],
-		defaultValue: "tab",
+		candidates: ["tab", "space", "mixed"],
+		defaultValue: "mixed",
 		panel: JavaFormatterSettingPanel.COMMON
 	};
 
@@ -67,15 +67,23 @@ function initializeCommonSettings(): JavaFormatterSetting[] {
 		panel: JavaFormatterSettingPanel.COMMON
 	};
 
+	const indentationSizeSetting: JavaFormatterSetting = {
+		name: "Indentation Size",
+		id: FormatterSettingConstants.INDENTATION_SIZE,
+		type: JavaFormatterSettingType.NUMBER,
+		defaultValue: "4",
+		panel: JavaFormatterSettingPanel.COMMON
+	};
+
 	const eofSetting: JavaFormatterSetting = {
-		name: "Insert New Line At The End Of File",
+		name: "Keep a new line at the end of file",
 		id: FormatterSettingConstants.INSERT_NEW_LINE_AT_THE_END_OF_FILE_IF_MISSING,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "false",
 		panel: JavaFormatterSettingPanel.COMMON
 	};
 
-	commonSettings.push(...[tabulationTypeSetting, tabulationSizeSetting, eofSetting]);
+	commonSettings.push(...[tabulationTypeSetting, indentationSizeSetting, tabulationSizeSetting, eofSetting]);
 
 	return commonSettings;
 }
@@ -446,7 +454,7 @@ function initializeWhitespaceSettings(): JavaFormatterSetting[] {
 	};
 
 	const whitespaceBeforeAtInAnnotationTypeDeclarationSetting: JavaFormatterSetting = {
-		name: "Insert whitespace before at in annotation type declaration",
+		name: "Insert whitespace before @ in annotation type declaration",
 		id: FormatterSettingConstants.INSERT_SPACE_BEFORE_AT_IN_ANNOTATION_TYPE_DECLARATION,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "true",
@@ -456,14 +464,6 @@ function initializeWhitespaceSettings(): JavaFormatterSetting[] {
 	const whitespaceAfterOpeningBraceInArrayInitializerSetting: JavaFormatterSetting = {
 		name: "Insert whitespace after opening brace in array initializer",
 		id: FormatterSettingConstants.INSERT_SPACE_AFTER_OPENING_BRACE_IN_ARRAY_INITIALIZER,
-		type: JavaFormatterSettingType.BOOLEAN,
-		defaultValue: "true",
-		panel: JavaFormatterSettingPanel.WHITESPACE
-	};
-
-	const whitespaceAfterColonInCaseSetting: JavaFormatterSetting = {
-		name: "Insert whitespace after colon in case",
-		id: FormatterSettingConstants.INSERT_SPACE_AFTER_COLON_IN_CASE,
 		type: JavaFormatterSettingType.BOOLEAN,
 		defaultValue: "true",
 		panel: JavaFormatterSettingPanel.WHITESPACE
@@ -485,10 +485,9 @@ function initializeWhitespaceSettings(): JavaFormatterSetting[] {
 		panel: JavaFormatterSettingPanel.WHITESPACE
 	};
 
-	whitespaceSettings.push(...[whitespaceBeforeClosingBraceInArrayInitializerSetting,
-		whitespaceBeforeAtInAnnotationTypeDeclarationSetting,
+	whitespaceSettings.push(...[whitespaceBeforeAtInAnnotationTypeDeclarationSetting,
+		whitespaceBeforeClosingBraceInArrayInitializerSetting,
 		whitespaceAfterOpeningBraceInArrayInitializerSetting,
-		whitespaceAfterColonInCaseSetting,
 		whitespaceAfterClosingParenthesisInCastSetting,
 		whitespaceAfterClosingAngleBracketInTypeArgumentsSetting
 	]);

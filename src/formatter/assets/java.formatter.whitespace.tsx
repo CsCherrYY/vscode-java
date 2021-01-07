@@ -39,7 +39,7 @@ export class WhitespaceSettingsPanel extends React.Component<WhitespaceSettingsP
 		});
 	}
 
-	private test: string = "class MyClass \{private int a = 0,b = 11,c = 2,d = 3;\nprivate int aa = -4 + -9;\nprivate int bb = aa++ / --number;\npublic void bar(int x, int y){}\n\}";
+	private test: string = `class Example \{\n\tprivate int[] array1 = new int[] {1, 2, 3};\n\t@interface\n\tMyAnnotation {\n\t\tString value();\n\t}\n\tString s = ((String)object);\n\}`;
 
 	private whitespacePreviewPanel = React.createElement(CodePreviewPanel, { code: this.test, panel: JavaFormatterSettingPanel.WHITESPACE });
 
