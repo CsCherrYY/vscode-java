@@ -1000,10 +1000,10 @@
         "displayName": "Java Formatter Settings",
         "selector": [
           {
-            "filenamePattern": "vscode-java.xml"
+            "filenamePattern": "*.xml"
           }
         ],
-        "priority": "default"
+        "priority": "option"
       }
     ]
   },

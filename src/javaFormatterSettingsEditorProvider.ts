@@ -11,6 +11,10 @@ import { formatterSettingConverter } from "./formatter/FormatterSettingConverter
 const xml2js = require('xml2js');
 export class JavaFormatterSettingsEditorProvider implements CustomTextEditorProvider {
 
+	/*
+	let resource = Uri.file("C:/work/test/spring-petclinic/eclipse-formatter.xml");
+	commands.executeCommand("vscode.openWith", resource, "vscjava.javaFormatterSettings");
+	*/
 	public static readonly viewType = 'vscjava.javaFormatterSettings';
 
 	private tabsize: number = 4;
