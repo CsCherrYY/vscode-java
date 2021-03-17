@@ -15,8 +15,6 @@ export function ToSingleLSPTypeHierarchyItem(client: LanguageClient, typeHierarc
 		uri: typeHierarchyItem.uri,
 		range: client.code2ProtocolConverter.asRange(typeHierarchyItem.range),
 		selectionRange: client.code2ProtocolConverter.asRange(typeHierarchyItem.selectionRange),
-		parents: undefined,
-		children: undefined,
 		data: typeHierarchyItem.data,
 	};
 }
@@ -24,30 +22,6 @@ export function ToSingleLSPTypeHierarchyItem(client: LanguageClient, typeHierarc
 export function ToTypeHierarchyItem(client: LanguageClient, lspTypeHierarchyItem: LSPTypeHierarchyItem, direction: TypeHierarchyDirection): TypeHierarchyItem {
 	if (!lspTypeHierarchyItem) {
 		return undefined;
-	}
-	let parents: TypeHierarchyItem[];
-	let children: TypeHierarchyItem[];
-	if (direction === TypeHierarchyDirection.Parents || direction === TypeHierarchyDirection.Both) {
-		if (lspTypeHierarchyItem.parents) {
-			parents = [];
-			for (const parent of lspTypeHierarchyItem.parents) {
-				parents.push(ToTypeHierarchyItem(client, parent, TypeHierarchyDirection.Parents));
-			}
-			parents = parents.sort((a, b) => {
-				return (a.kind.toString() === b.kind.toString()) ? a.name.localeCompare(b.name) : b.kind.toString().localeCompare(a.kind.toString());
-			});
-		}
-	}
-	if (direction === TypeHierarchyDirection.Children || direction === TypeHierarchyDirection.Both) {
-		if (lspTypeHierarchyItem.children) {
-			children = [];
-			for (const child of lspTypeHierarchyItem.children) {
-				children.push(ToTypeHierarchyItem(client, child, TypeHierarchyDirection.Children));
-			}
-			children = children.sort((a, b) => {
-				return (a.kind.toString() === b.kind.toString()) ? a.name.localeCompare(b.name) : b.kind.toString().localeCompare(a.kind.toString());
-			});
-		}
 	}
 	return {
 		name: lspTypeHierarchyItem.name,
@@ -57,8 +31,8 @@ export function ToTypeHierarchyItem(client: LanguageClient, lspTypeHierarchyItem
 		uri: lspTypeHierarchyItem.uri,
 		range: client.protocol2CodeConverter.asRange(lspTypeHierarchyItem.range),
 		selectionRange: client.protocol2CodeConverter.asRange(lspTypeHierarchyItem.selectionRange),
-		parents: parents,
-		children: children,
+		parents: undefined,
+		children: undefined,
 		data: lspTypeHierarchyItem.data,
 		expand: false,
 	};
@@ -77,21 +51,24 @@ export function typeHierarchyDirectionToContextString(direction: TypeHierarchyDi
 	}
 }
 
-export async function resolveTypeHierarchy(client: LanguageClient, typeHierarchyItem: TypeHierarchyItem, direction: TypeHierarchyDirection, token: CancellationToken): Promise<TypeHierarchyItem> {
+export async function resolveTypeHierarchy(client: LanguageClient, typeHierarchyItem: TypeHierarchyItem, direction: TypeHierarchyDirection, token: CancellationToken): Promise<TypeHierarchyItem[]> {
+	// direction can be only children or parents here.
 	const lspTypeHierarchyItem = ToSingleLSPTypeHierarchyItem(client, typeHierarchyItem);
-	let resolvedLSPItem: LSPTypeHierarchyItem;
+	let resolvedLSPItems: LSPTypeHierarchyItem[];
 	try {
-		resolvedLSPItem = await commands.executeCommand<LSPTypeHierarchyItem>(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.RESOLVE_TYPE_HIERARCHY, JSON.stringify(lspTypeHierarchyItem), JSON.stringify(direction), JSON.stringify(1), token);
+		resolvedLSPItems = await commands.executeCommand<LSPTypeHierarchyItem[]>(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.RESOLVE_TYPE_HIERARCHY, JSON.stringify(lspTypeHierarchyItem), JSON.stringify(direction), JSON.stringify(1), token);
 	} catch (e) {
 		// operation cancelled
 		return undefined;
 	}
-	const resolvedItem = ToTypeHierarchyItem(client, resolvedLSPItem, direction);
-	if (!resolvedItem) {
-		return undefined;
+	let resolvedItems: TypeHierarchyItem[] = [];
+	for (const lspItem of resolvedLSPItems) {
+		resolvedItems.push(ToTypeHierarchyItem(client, lspItem, direction));
 	}
-	resolvedItem.expand = typeHierarchyItem.expand;
-	return resolvedItem;
+	resolvedItems = resolvedItems.sort((a, b) => {
+		return (a.kind.toString() === b.kind.toString()) ? a.name.localeCompare(b.name) : b.kind.toString().localeCompare(a.kind.toString());
+	});
+	return resolvedItems;
 }
 
 export async function getRootItem(client: LanguageClient, typeHierarchyItem: TypeHierarchyItem, token: CancellationToken): Promise<TypeHierarchyItem> {
@@ -99,11 +76,11 @@ export async function getRootItem(client: LanguageClient, typeHierarchyItem: Typ
 		return undefined;
 	}
 	if (!typeHierarchyItem.parents) {
-		const resolvedItem = await resolveTypeHierarchy(client, typeHierarchyItem, TypeHierarchyDirection.Parents, token);
-		if (!resolvedItem || !resolvedItem.parents) {
+		const parents = await resolveTypeHierarchy(client, typeHierarchyItem, TypeHierarchyDirection.Parents, token);
+		if (!parents) {
 			return typeHierarchyItem;
 		} else {
-			typeHierarchyItem.parents = resolvedItem.parents;
+			typeHierarchyItem.parents = parents;
 		}
 	}
 	if (typeHierarchyItem.parents.length === 0) {

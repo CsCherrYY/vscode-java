@@ -15,8 +15,6 @@ export class LSPTypeHierarchyItem {
 	uri: string;
 	range: Range;
 	selectionRange: Range;
-	parents: LSPTypeHierarchyItem[];
-	children: LSPTypeHierarchyItem[];
 	data: any;
 }
 

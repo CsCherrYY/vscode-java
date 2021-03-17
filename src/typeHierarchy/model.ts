@@ -97,18 +97,25 @@ export class TypeHierarchyModel implements SymbolItemNavigation<TypeHierarchyIte
 
 class TypeHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHierarchyItem> {
 	private readonly _emitter: vscode.EventEmitter<TypeHierarchyItem> = new vscode.EventEmitter<TypeHierarchyItem>();
-	private readonly _modelListener: vscode.Disposable;
 	private lazyLoad: boolean;
-	public readonly onDidChangeTreeData: vscode.Event<TypeHierarchyItem> = this._emitter.event;
+	private lastCount: number;
+	private currentCount: number;
+	public readonly onDidChangeTreeData = this._emitter.event;
 
 	constructor(readonly model: TypeHierarchyModel, readonly client: LanguageClient, readonly token: CancellationToken) {
-		this._modelListener = model.onDidChangeEvent(e => this._emitter.fire(e instanceof TypeHierarchyItem ? e : undefined));
 		this.lazyLoad = workspace.getConfiguration().get("java.typeHierarchy.lazyLoad");
+		this.lastCount = 0;
+		this.currentCount = 0;
+		setInterval(() => {
+			if (this.currentCount !== 0) {
+				this._emitter.fire(undefined);
+				this.currentCount = 0;
+			}
+		}, 5000);
 	}
 
 	dispose(): void {
 		this._emitter.dispose();
-		this._modelListener.dispose();
 	}
 
 	async getTreeItem(element: TypeHierarchyItem): Promise<vscode.TreeItem> {
@@ -127,7 +134,7 @@ class TypeHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHiera
 			]
 		} : undefined;
 		// workaround: set a specific id to refresh the collapsible state for treeItems, see: https://github.com/microsoft/vscode/issues/114614#issuecomment-763428052
-		treeItem.id = `${element.data}${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`;
+		// treeItem.id = `${element.data}${Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)}`;
 		if (element.expand) {
 			treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Expanded;
 		} else if (this.model.getDirection() === TypeHierarchyDirection.Children || this.model.getDirection() === TypeHierarchyDirection.Both) {
@@ -146,13 +153,15 @@ class TypeHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHiera
 						treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
 						return treeItem;
 					}
-					const resolvedItem = await resolveTypeHierarchy(this.client, element, this.model.getDirection(), this.token);
-					if (!resolvedItem) {
-						return undefined;
-					}
-					element.children = resolvedItem.children;
+					treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
+					// element.children = await resolveTypeHierarchy(this.client, element, TypeHierarchyDirection.Children, this.token);
+					resolveTypeHierarchy(this.client, element, TypeHierarchyDirection.Children, this.token).then((children) => {
+						element.children = children;
+						this.currentCount++;
+					});
+				} else {
+					treeItem.collapsibleState = (element.children.length === 0) ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed;
 				}
-				treeItem.collapsibleState = (element.children.length === 0) ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed;
 			}
 		} else if (this.model.getDirection() === TypeHierarchyDirection.Parents) {
 			if (element === this.model.getBaseItem()) {
@@ -169,11 +178,7 @@ class TypeHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHiera
 						treeItem.collapsibleState = vscode.TreeItemCollapsibleState.Collapsed;
 						return treeItem;
 					}
-					const resolvedItem = await resolveTypeHierarchy(this.client, element, this.model.getDirection(), this.token);
-					if (!resolvedItem) {
-						return undefined;
-					}
-					element.parents = resolvedItem.parents;
+					element.parents = await resolveTypeHierarchy(this.client, element, TypeHierarchyDirection.Parents, this.token);
 				}
 				treeItem.collapsibleState = (element.parents.length === 0) ? vscode.TreeItemCollapsibleState.None : vscode.TreeItemCollapsibleState.Collapsed;
 			}
@@ -190,23 +195,16 @@ class TypeHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHiera
 				if (TypeHierarchyTreeDataProvider.isWhiteListType(element)) {
 					return [TypeHierarchyTreeDataProvider.getFakeItem(element)];
 				}
-				const resolvedItem = await resolveTypeHierarchy(this.client, element, this.model.getDirection(), this.token);
-				if (!resolvedItem) {
-					return undefined;
-				}
-				element.children = resolvedItem.children;
+				element.children = await resolveTypeHierarchy(this.client, element, TypeHierarchyDirection.Children, this.token);
 				if (element.children.length === 0) {
 					this._emitter.fire(element);
 				}
 			}
+			this.lastCount = element.children.length;
 			return element.children;
 		} else if (this.model.getDirection() === TypeHierarchyDirection.Parents) {
 			if (!element.parents) {
-				const resolvedItem = await resolveTypeHierarchy(this.client, element, this.model.getDirection(), this.token);
-				if (!resolvedItem) {
-					return undefined;
-				}
-				element.parents = resolvedItem.parents;
+				element.parents = await resolveTypeHierarchy(this.client, element, TypeHierarchyDirection.Parents, this.token);
 				if (element.parents.length === 0) {
 					this._emitter.fire(element);
 				}
