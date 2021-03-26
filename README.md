@@ -20,7 +20,7 @@ Features
 =========
 ![ screencast ](https://raw.githubusercontent.com/redhat-developer/vscode-java/master/images/vscode-java.0.0.1.gif)
 
-* Supports code from Java 1.5 to Java 15
+* Supports code from Java 1.5 to Java 16
 * Maven pom.xml project support
 * Basic Gradle Java project support (Android not supported)
 * Standalone Java files support
@@ -42,6 +42,8 @@ Features
 * Annotation processing support (automatic for Maven projects)
 * Semantic selection
 * Diagnostic tags
+* Call Hierarchy
+* Type Hierarchy
 
 Please note that [Gradle-based Android projects are not supported](https://github.com/redhat-developer/vscode-java/issues/10#issuecomment-268834749).
 
@@ -51,15 +53,16 @@ See the [changelog](CHANGELOG.md) for the latest release. You might also find us
 
 Setting the JDK
 ===============
-The path to the Java Development Kit is searched in the following order:
+## Java Tooling JDK
+This JDK will be used to launch the Java Language Server. And by default, will also be used to compile your projects.
 
-- the `java.home` setting in VS Code settings (workspace then user settings)
+The path to the Java Development Kit can be specified by the `java.home` setting in VS Code settings (workspace/user settings). If not specified, it is searched in the following order until a JDK meets current minimum requirement.
+
 - the `JDK_HOME` environment variable
 - the `JAVA_HOME` environment variable
 - on the current system path
 
-This JDK will be used to launch the Java Language Server. And by default, will be used to compile your projects.
-
+## Project JDKs
 If you need to compile your projects against a different JDK version, it's recommended you configure the `java.configuration.runtimes` property in your user settings, eg:
 
 ```json
@@ -73,8 +76,8 @@ If you need to compile your projects against a different JDK version, it's recom
     "path": "/path/to/jdk-11",
   },
   {
-    "name": "JavaSE-15",
-    "path": "/path/to/jdk-15",
+    "name": "JavaSE-16",
+    "path": "/path/to/jdk-16",
     "default": true
   },
 ]
@@ -84,13 +87,21 @@ The default runtime will be used when you open standalone Java files.
 Available commands
 ==========================
 The following commands are available:
-- `Java:Update Project configuration` (`Shift+Alt+U`):  is available when the editor is focused on a Maven pom.xml or a Gradle file. It forces project configuration / classpath updates (eg. dependency changes or Java compilation level), according to the project build descriptor.
-- `Java:Open Java language server log file`: opens the Java Language Server log file, useful for troubleshooting problems.
-- `Java:Open Java extension log file`: opens the Java extension log file, useful for troubleshooting problems.
-- `Java:Force Java compilation` (`Shift+Alt+B`): manually triggers compilation of the workspace.
-- `Java:Open Java formatter settings`: Open the Eclipse formatter settings. Creates a new settings file if none exists.
-- `Java:Clean the Java language server workspace`: Clean the Java language server workspace.
-- `Java:Attach Source`: Attach a jar/zip source to the currently opened binary class file. This command is only available in the editor context menu.
+- `Switch to Standard Mode`: switches the Java Language Server to `Standard` mode. This command is only available when the Java Language Server is in `LightWeight` mode.
+- `Java: Update Project` (`Shift+Alt+U`): is available when the editor is focused on a Maven pom.xml or a Gradle file. It forces project configuration / classpath updates (eg. dependency changes or Java compilation level), according to the project build descriptor.
+- `Java: Import Java Projects into Workspace`: detects and imports all the Java projects into the Java Language Server workspace.
+- `Java: Open Java Language Server Log File`: opens the Java Language Server log file, useful for troubleshooting problems.
+- `Java: Open Java Extension Log File`: opens the Java extension log file, useful for troubleshooting problems.
+- `Java: Open All Log Files`: opens both the Java Language Server log file and the Java extension log file.
+- `Java: Force Java Compilation` (`Shift+Alt+B`): manually triggers compilation of the workspace.
+- `Java: Open Java Formatter Settings`: opens the Eclipse formatter settings. Creates a new settings file if none exists.
+- `Java: Clean Java Language Server Workspace`: cleans the Java language server workspace.
+- `Java: Attach Source`: attaches a jar/zip source to the currently opened binary class file. This command is only available in the editor context menu.
+- `Java: Add Folder to Java Source Path`: adds the selected folder to its project source path. This command is only available in the file explorer context menu and only works for unmanaged folders.
+- `Java: Remove Folder from Java Source Path`: removes the selected folder from its project source path. This command is only available in the file explorer context menu and only works for unmanaged folders.
+- `Java: List All Java Source Paths`: lists all the Java source paths recognized by the Java Language Server workspace.
+- `Java: Show Build Job Status`: shows the Java Language Server job status in Visual Studio Code terminal.
+- `Java: Go to Super Implementation`: goes to the super implementation for the current selected symbol in editor.
 
 Supported VS Code settings
 ==========================
@@ -101,8 +112,8 @@ The following settings are supported:
 * `java.errors.incompleteClasspath.severity` : Specifies the severity of the message when the classpath is incomplete for a Java file. Supported values are `ignore`, `info`, `warning`, `error`.
 * `java.trace.server` : Traces the communication between VS Code and the Java language server.
 * `java.configuration.updateBuildConfiguration` : Specifies how modifications on build files update the Java classpath/configuration. Supported values are `disabled` (nothing happens), `interactive` (asks about updating on every modification), `automatic` (updating is automatically triggered).
-* `java.configuration.maven.userSettings` : Path to Maven's settings.xml.
-* `java.configuration.checkProjectSettingsExclusions`: Checks if the extension-generated project settings files (`.project`, `.classpath`, `.factorypath`, `.settings/`) should be excluded from the file explorer. Defaults to `true`.
+* `java.configuration.maven.userSettings` : Path to Maven's user settings.xml.
+* `java.configuration.checkProjectSettingsExclusions`: Controls whether to exclude extension-generated project settings files (`.project`, `.classpath`, `.factorypath`, `.settings/`) from the file explorer. Defaults to `true`.
 * `java.referencesCodeLens.enabled` : Enable/disable the references code lenses.
 * `java.implementationsCodeLens.enabled` : Enable/disable the implementations code lenses.
 * `java.signatureHelp.enabled` : Enable/disable signature help support (triggered on `(`).
@@ -133,7 +144,7 @@ The following settings are supported:
 * `java.format.comments.enabled` : Includes the comments during code formatting.
 * `java.format.onType.enabled` : Enable/disable on-type formatting (triggered on `;`, `}` or `<return>`).
 * `java.foldingRange.enabled`: Enable/disable smart folding range support. If disabled, it will use the default indentation-based folding range provided by VS Code.
-* `java.maven.downloadSources`: Enable/disable eager download of Maven source artifacts.
+* `java.maven.downloadSources`: Enable/disable download of Maven source artifacts as part of importing Maven projects.
 * `java.maven.updateSnapshots`: Force update of Snapshots/Releases. Defaults to `false`.
 * `java.codeGeneration.hashCodeEquals.useInstanceof`: Use 'instanceof' to compare types when generating the hashCode and equals methods. Defaults to `false`.
 * `java.codeGeneration.hashCodeEquals.useJava7Objects`: Use Objects.hash and Objects.equals when generating the hashCode and equals methods. This setting only applies to Java 7 and higher. Defaults to `false`.
@@ -146,6 +157,7 @@ The following settings are supported:
 * `java.codeGeneration.toString.limitElements`: Limit number of items in arrays/collections/maps to list, if 0 then list all. Defaults to `0`.
 * `java.selectionRange.enabled`: Enable/disable Smart Selection support for Java. Disabling this option will not affect the VS Code built-in word-based and bracket-based smart selection.
 * `java.showBuildStatusOnStart.enabled`: Automatically show build status on startup. Defaults to `false`.
+* `java.project.outputPath`: A relative path to the workspace where stores the compiled output. `Only` effective in the `WORKSPACE` scope. The setting will `NOT` affect Maven or Gradle project.
 * `java.project.referencedLibraries`: Configure glob patterns for referencing local libraries to a Java project.
 * `java.completion.maxResults`: Maximum number of completion results (not including snippets). `0` (the default value) disables the limit, all results are returned. In case of performance problems, consider setting a sensible limit..
 * `java.configuration.runtimes`: Map Java Execution Environments to local JDKs.
@@ -158,11 +170,6 @@ The following settings are supported:
 * `java.sources.organizeImports.starThreshold`: Specifies the number of imports added before a star-import declaration is used, default is 99.
 * `java.sources.organizeImports.staticStarThreshold`: Specifies the number of static imports added before a star-import declaration is used, default is 99.
 * `java.semanticHighlighting.enabled`: Enable/disable [Semantic Highlighting](https://github.com/redhat-developer/vscode-java/wiki/Semantic-Highlighting) for Java files. Defaults to `true`.
-* `java.refactor.renameFromFileExplorer`: Specifies whether to update imports and package declarations when renaming files from File Explorer. Defaults to `prompt`.
-  - `never`: Don't enable refactoring for rename operations on File Explorer.
-  - `autoApply`: Always automatically update the imports and package declarations.
-  - `preview`: Always preview the changes before applying.
-  - `prompt`: Ask user to confirm whether to bypass refactor preview.
 * `java.imports.gradle.wrapper.checksums`: Defines allowed/disallowed SHA-256 checksums of Gradle Wrappers.
 * `java.project.importOnFirstTimeStartup`: Specifies whether to import the Java projects, when opening the folder in Hybrid mode for the first time. Supported values are `disabled` (never imports), `interactive` (asks to import or not), `automatic` (always imports). Default to `interactive`.
 * `java.project.importHint`: Enable/disable the server-mode switch information, when Java projects import is skipped on startup. Defaults to `true`.
@@ -170,9 +177,15 @@ The following settings are supported:
 * `java.project.resourceFilters`: Excludes files and folders from being refreshed by the Java Language Server, which can improve the overall performance. For example, ["node_modules",".git"] will exclude all files and folders named 'node_modules' or '.git'. Defaults to ["node_modules",".git"].
 * `java.templates.fileHeader`: Specifies the file header comment for new Java file. Supports configuring multi-line comments with an array of strings, and using ${variable} to reference the [predefined variables](https://github.com/redhat-developer/vscode-java/wiki/Predefined-Variables-for-Java-Template-Snippets).
 * `java.templates.typeComment`: Specifies the type comment for new Java type. Supports configuring multi-line comments with an array of strings, and using ${variable} to reference the [predefined variables](https://github.com/redhat-developer/vscode-java/wiki/Predefined-Variables-for-Java-Template-Snippets).
-
-New in 0.69.0:
 * `java.references.includeAccessors`: Include getter, setter and builder/constructor when finding references. Default to true.
+* `java.configuration.maven.globalSettings` : Path to Maven's global settings.xml.
+* `java.eclipse.downloadSources` : Enable/disable download of Maven source artifacts for Eclipse projects.
+* `java.recommendations.dependency.analytics.show` : Show the recommended Dependency Analytics extension.
+
+New in 0.77.0:
+* `java.references.includeDecompiledSources` : Include the decompiled sources when finding references. Default to true.
+* `java.project.sourcePaths`: Relative paths to the workspace where stores the source files. `Only` effective in the `WORKSPACE` scope. The setting will `NOT` affect Maven or Gradle project.
+* `java.typeHierarchy.lazyLoad` : Enable/disable lazy loading the content in type hierarchy. Lazy loading could save a lot of loading time but every type should be expanded manually to load its content.
 
 Semantic Highlighting
 ===============
