@@ -2,18 +2,22 @@
 
 import {
     CodeActionParams,
+    DocumentUri,
     ExecuteCommandParams,
     FormattingOptions,
     Location,
     NotificationType,
+    PartialResultParams,
     RequestType,
     SymbolInformation,
     TextDocumentIdentifier,
     TextDocumentPositionParams,
+    WorkDoneProgressParams,
     WorkspaceEdit,
     WorkspaceSymbolParams,
 } from 'vscode-languageclient';
-import { Command, Range } from 'vscode';
+import * as vscode from "vscode";
+import * as languageclient from "vscode-languageclient";
 
 /**
  * The message type. Copied from vscode protocol
@@ -68,25 +72,25 @@ export enum CompileWorkspaceStatus {
 }
 
 export interface StatusReport {
-	message: string;
-	type: string;
+    message: string;
+    type: string;
 }
 
 export interface ProgressReport {
-	id: string;
-	task: string;
-	subTask: string;
-	status: string;
-	workDone: number;
-	totalWork: number;
-	complete: boolean;
+    id: string;
+    task: string;
+    subTask: string;
+    status: string;
+    workDone: number;
+    totalWork: number;
+    complete: boolean;
 }
 
 export interface ActionableMessage {
-	severity: MessageType;
-	message: string;
-	data?: any;
-	commands?: Command[];
+    severity: MessageType;
+    message: string;
+    data?: any;
+    commands?: vscode.Command[];
 }
 
 export interface EventNotification {
@@ -95,19 +99,19 @@ export interface EventNotification {
 }
 
 export namespace StatusNotification {
-	export const type = new NotificationType<StatusReport>('language/status');
+    export const type = new NotificationType<StatusReport>('language/status');
 }
 
 export namespace ProgressReportNotification {
-	export const type = new NotificationType<ProgressReport>('language/progressReport');
+    export const type = new NotificationType<ProgressReport>('language/progressReport');
 }
 
 export namespace ClassFileContentsRequest {
-    export const type = new RequestType<TextDocumentIdentifier, string, void> ('java/classFileContents');
+    export const type = new RequestType<TextDocumentIdentifier, string, void>('java/classFileContents');
 }
 
 export namespace ProjectConfigurationUpdateRequest {
-    export const type = new NotificationType<TextDocumentIdentifier> ('java/projectConfigurationUpdate');
+    export const type = new NotificationType<TextDocumentIdentifier>('java/projectConfigurationUpdate');
 }
 
 export namespace ActionableNotification {
@@ -157,8 +161,8 @@ export interface OverridableMethod {
 }
 
 export interface OverridableMethodsResponse {
-	type: string;
-	methods: OverridableMethod[];
+    type: string;
+    methods: OverridableMethod[];
 }
 
 export namespace ListOverridableMethodsRequest {
@@ -212,7 +216,7 @@ export interface ImportCandidate {
 
 export interface ImportSelection {
     candidates: ImportCandidate[];
-    range: Range;
+    range: vscode.Range;
 }
 
 export interface CheckToStringResponse {
@@ -314,7 +318,7 @@ export interface RenamePosition {
 
 export interface RefactorWorkspaceEdit {
     edit: WorkspaceEdit;
-    command?: Command;
+    command?: vscode.Command;
     errorMessage?: string;
 }
 
@@ -405,4 +409,151 @@ export interface RenameFilesParams {
 
 export namespace WillRenameFiles {
     export const type = new RequestType<RenameFilesParams, WorkspaceEdit, void>('workspace/willRenameFiles');
+}
+
+/**
+ * Represents programming constructs like functions or constructors in the context
+ * of type hierarchy.
+ *
+ * @since 3.17.0
+ */
+export interface TypeHierarchyItemCode {
+    /**
+     * The name of this item.
+     */
+    name: string;
+    /**
+     * The kind of this item.
+     */
+    kind: vscode.SymbolKind;
+    /**
+     * Tags for this item.
+     */
+    tags?: vscode.SymbolTag[];
+    /**
+     * More detail for this item, e.g. the signature of a function.
+     */
+    detail?: string;
+    /**
+     * The resource identifier of this item.
+     */
+    uri: DocumentUri;
+    /**
+     * The range enclosing this symbol not including leading/trailing whitespace
+     * but everything else, e.g. comments and code.
+     */
+    range: vscode.Range;
+    /**
+     * The range that should be selected and revealed when this symbol is being
+     * picked, e.g. the name of a function. Must be contained by the
+     * [`range`](#TypeHierarchyItem.range).
+     */
+    selectionRange: vscode.Range;
+    /**
+     * A data entry field that is preserved between a type hierarchy prepare and
+     * supertypes or subtypes requests. It could also be used to identify the
+     * type hierarchy in the server, helping improve the performance on
+     * resolving supertypes and subtypes.
+     */
+    data?: unknown;
+}
+
+/**
+ * Represents programming constructs like functions or constructors in the context
+ * of type hierarchy.
+ *
+ * @since 3.17.0
+ */
+export interface TypeHierarchyItemLSP {
+    /**
+     * The name of this item.
+     */
+    name: string;
+    /**
+     * The kind of this item.
+     */
+    kind: languageclient.SymbolKind;
+    /**
+     * Tags for this item.
+     */
+    tags?: languageclient.SymbolTag[];
+    /**
+     * More detail for this item, e.g. the signature of a function.
+     */
+    detail?: string;
+    /**
+     * The resource identifier of this item.
+     */
+    uri: DocumentUri;
+    /**
+     * The range enclosing this symbol not including leading/trailing whitespace
+     * but everything else, e.g. comments and code.
+     */
+    range: languageclient.Range;
+    /**
+     * The range that should be selected and revealed when this symbol is being
+     * picked, e.g. the name of a function. Must be contained by the
+     * [`range`](#TypeHierarchyItem.range).
+     */
+    selectionRange: languageclient.Range;
+    /**
+     * A data entry field that is preserved between a type hierarchy prepare and
+     * supertypes or subtypes requests. It could also be used to identify the
+     * type hierarchy in the server, helping improve the performance on
+     * resolving supertypes and subtypes.
+     */
+    data?: unknown;
+}
+
+/**
+ * The parameter of a `textDocument/prepareTypeHierarchy` request.
+ *
+ * @since 3.17.0
+ */
+export interface TypeHierarchyPrepareParams extends TextDocumentPositionParams, WorkDoneProgressParams {
+}
+
+/**
+ * The parameter of a `typeHierarchy/supertypes` request.
+ *
+ * @since 3.17.0
+ */
+export interface TypeHierarchySupertypesParams extends WorkDoneProgressParams, PartialResultParams {
+    item: TypeHierarchyItemLSP;
+}
+
+/**
+ * The parameter of a `typeHierarchy/subtypes` request.
+ *
+ * @since 3.17.0
+ */
+export interface TypeHierarchySubtypesParams extends WorkDoneProgressParams, PartialResultParams {
+    item: TypeHierarchyItemLSP;
+}
+
+export namespace PrepareTypeHierarchy {
+    export const type = new RequestType<TypeHierarchyPrepareParams, TypeHierarchyItemLSP[] | null, void>('java/prepareTypeHierarchy');
+}
+
+export namespace TypeHierarchySupertypes {
+    export const type = new RequestType<TypeHierarchySupertypesParams, TypeHierarchyItemLSP[] | null, void>('java/supertypes');
+}
+
+export namespace TypeHierarchySubtypes {
+    export const type = new RequestType<TypeHierarchySubtypesParams, TypeHierarchyItemLSP[] | null, void>('java/subtypes');
+}
+
+export namespace RootType {
+    export const type = new RequestType<TypeHierarchySubtypesParams, TypeHierarchyItemLSP | null, void>('java/rootType');
+}
+
+export enum TypeHierarchyView {
+    Supertype,
+    Subtype,
+    Class
+}
+
+export enum TypeHierarchyRequest {
+    Supertype,
+    Subtype,
 }

@@ -1,21 +1,21 @@
 import * as vscode from "vscode";
-import { Position, TextDocumentIdentifier, TextDocumentPositionParams } from "vscode-languageclient";
+import { Position, TextDocumentIdentifier } from "vscode-languageclient";
 import { LanguageClient } from "vscode-languageclient/node";
-import { Commands } from "../commands";
 import { getActiveLanguageClient } from "../extension";
+import { PrepareTypeHierarchy, TypeHierarchyItemCode, TypeHierarchyItemLSP, TypeHierarchyPrepareParams, TypeHierarchyView } from "../protocol";
 import { showNoLocationFound } from "../standardLanguageClient";
+import { ClassHierarchyTreeInput } from "./classHierarchyModel";
 import { TypeHierarchyTreeInput } from "./model";
-import { LSPTypeHierarchyItem, TypeHierarchyDirection, TypeHierarchyItem } from "./protocol";
 import { SymbolTree } from "./references-view";
-import { ToTypeHierarchyItem } from "./util";
+import { ToTypeHierarchyItemCode } from "./util";
 
 export class TypeHierarchyTree {
 	private api: SymbolTree;
-	private direction: TypeHierarchyDirection;
+	private view: TypeHierarchyView;
 	private client: LanguageClient;
 	private cancelTokenSource: vscode.CancellationTokenSource;
 	private location: vscode.Location;
-	private baseItem: TypeHierarchyItem;
+	private baseItem: TypeHierarchyItemCode;
 	public initialized: boolean;
 
 	constructor() {
@@ -28,7 +28,7 @@ export class TypeHierarchyTree {
 		this.initialized = true;
 	}
 
-	public async setTypeHierarchy(location: vscode.Location, direction: TypeHierarchyDirection): Promise<void> {
+	public async setTypeHierarchy(location: vscode.Location): Promise<void> {
 		if (!this.initialized) {
 			await this.initialize();
 		}
@@ -41,34 +41,33 @@ export class TypeHierarchyTree {
 		this.cancelTokenSource = new vscode.CancellationTokenSource();
 		const textDocument: TextDocumentIdentifier = TextDocumentIdentifier.create(location.uri.toString());
 		const position: Position = Position.create(location.range.start.line, location.range.start.character);
-		const params: TextDocumentPositionParams = {
+		const params: TypeHierarchyPrepareParams = {
 			textDocument: textDocument,
 			position: position,
 		};
-		let lspItem: LSPTypeHierarchyItem;
+		let lspItem: TypeHierarchyItemLSP;
 		try {
-			lspItem = await vscode.commands.executeCommand(Commands.EXECUTE_WORKSPACE_COMMAND, Commands.OPEN_TYPE_HIERARCHY, JSON.stringify(params), JSON.stringify(direction), JSON.stringify(0), this.cancelTokenSource.token);
+			const prepareResults = await this.client.sendRequest(PrepareTypeHierarchy.type, params, this.cancelTokenSource.token);
+			if (!prepareResults) {
+				showNoLocationFound('No Type Hierarchy found');
+				return;
+			}
+			lspItem = prepareResults[0];
 		} catch (e) {
 			// operation cancelled
 			return;
 		}
-		if (!lspItem) {
-			showNoLocationFound('No Type Hierarchy found');
-			return;
-		}
 		const symbolKind = this.client.protocol2CodeConverter.asSymbolKind(lspItem.kind);
-		if (direction === TypeHierarchyDirection.Both && symbolKind === vscode.SymbolKind.Interface) {
-			direction = TypeHierarchyDirection.Children;
-		}
-		const item: TypeHierarchyItem = ToTypeHierarchyItem(this.client, lspItem, direction);
-		const input: TypeHierarchyTreeInput = new TypeHierarchyTreeInput(location, direction, this.cancelTokenSource.token, item);
+		const view: TypeHierarchyView = (symbolKind === vscode.SymbolKind.Interface) ? TypeHierarchyView.Subtype : TypeHierarchyView.Class;
+		const item: TypeHierarchyItemCode = ToTypeHierarchyItemCode(this.client, lspItem);
+		const input = (view === TypeHierarchyView.Class) ? new ClassHierarchyTreeInput(location, this.cancelTokenSource.token, item) : new TypeHierarchyTreeInput(location, view, this.cancelTokenSource.token, item);
 		this.location = location;
-		this.direction = direction;
+		this.view = view;
 		this.baseItem = item;
 		this.api.setInput(input);
 	}
 
-	public changeDirection(direction: TypeHierarchyDirection): void {
+	public changeView(view: TypeHierarchyView): void {
 		if (!this.api) {
 			return;
 		}
@@ -76,14 +75,12 @@ export class TypeHierarchyTree {
 			this.cancelTokenSource.cancel();
 		}
 		this.cancelTokenSource = new vscode.CancellationTokenSource();
-		this.baseItem.children = undefined;
-		this.baseItem.parents = undefined;
-		const input: TypeHierarchyTreeInput = new TypeHierarchyTreeInput(this.location, direction, this.cancelTokenSource.token, this.baseItem);
-		this.direction = direction;
+		const input = (view === TypeHierarchyView.Class) ? new ClassHierarchyTreeInput(this.location, this.cancelTokenSource.token, this.baseItem) : new TypeHierarchyTreeInput(this.location, view, this.cancelTokenSource.token, this.baseItem);
+		this.view = view;
 		this.api.setInput(input);
 	}
 
-	public async changeBaseItem(item: TypeHierarchyItem): Promise<void> {
+	public async changeBaseItem(item: TypeHierarchyItemCode): Promise<void> {
 		if (!this.api) {
 			return;
 		}
@@ -91,11 +88,9 @@ export class TypeHierarchyTree {
 			this.cancelTokenSource.cancel();
 		}
 		this.cancelTokenSource = new vscode.CancellationTokenSource();
-		item.parents = undefined;
-		item.children = undefined;
 		const location: vscode.Location = new vscode.Location(vscode.Uri.parse(item.uri), item.selectionRange);
 		const newLocation: vscode.Location = (await this.isValidRequestPosition(location.uri, location.range.start)) ? location : this.location;
-		const input: TypeHierarchyTreeInput = new TypeHierarchyTreeInput(newLocation, this.direction, this.cancelTokenSource.token, item);
+		const input = (this.view === TypeHierarchyView.Class) ? new ClassHierarchyTreeInput(newLocation, this.cancelTokenSource.token, item) : new TypeHierarchyTreeInput(newLocation, this.view, this.cancelTokenSource.token, item);
 		this.location = newLocation;
 		this.baseItem = item;
 		this.api.setInput(input);

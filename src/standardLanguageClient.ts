@@ -7,7 +7,7 @@ import { prepareExecutable, awaitServerConnection } from "./javaServerStarter";
 import { getJavaConfig, applyWorkspaceEdit } from "./extension";
 import { LanguageClientOptions, Position as LSPosition, Location as LSLocation, MessageType, TextDocumentPositionParams, ConfigurationRequest, ConfigurationParams } from "vscode-languageclient";
 import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
-import { CompileWorkspaceRequest, CompileWorkspaceStatus, SourceAttachmentRequest, SourceAttachmentResult, SourceAttachmentAttribute, ProjectConfigurationUpdateRequest, FeatureStatus, StatusNotification, ProgressReportNotification, ActionableNotification, ExecuteClientCommandRequest, ServerNotification, EventNotification, EventType, LinkLocation, FindLinks } from "./protocol";
+import { CompileWorkspaceRequest, CompileWorkspaceStatus, SourceAttachmentRequest, SourceAttachmentResult, SourceAttachmentAttribute, ProjectConfigurationUpdateRequest, FeatureStatus, StatusNotification, ProgressReportNotification, ActionableNotification, ExecuteClientCommandRequest, ServerNotification, EventNotification, EventType, LinkLocation, FindLinks, TypeHierarchyItemCode, TypeHierarchySubtypesParams, TypeHierarchySubtypes, TypeHierarchySupertypesParams, TypeHierarchySupertypes, TypeHierarchyView } from "./protocol";
 import { setGradleWrapperChecksum, excludeProjectSettingsFiles, ServerMode } from "./settings";
 import { onExtensionChange, collectBuildFilePattern } from "./plugin";
 import { serverTaskPresenter } from "./serverTaskPresenter";
@@ -28,8 +28,8 @@ import * as fileEventHandler from './fileEventHandler';
 import { markdownPreviewProvider } from "./markdownPreviewProvider";
 import { RefactorDocumentProvider, javaRefactorKinds } from "./codeActionProvider";
 import { typeHierarchyTree } from "./typeHierarchy/typeHierarchyTree";
-import { TypeHierarchyDirection, TypeHierarchyItem } from "./typeHierarchy/protocol";
 import { buildFilePatterns } from './plugin';
+import { ToTypeHierarchyItemCode, ToTypeHierarchyItemLSP } from "./typeHierarchy/util";
 
 const extensionName = 'Language Support for Java';
 const GRADLE_CHECKSUM = "gradle/checksum/prompt";
@@ -291,28 +291,54 @@ export class StandardLanguageClient {
 
 			context.subscriptions.push(commands.registerCommand(Commands.SHOW_TYPE_HIERARCHY, (location: any) => {
 				if (location instanceof Uri) {
-					typeHierarchyTree.setTypeHierarchy(new Location(location, window.activeTextEditor.selection.active), TypeHierarchyDirection.Both);
+					typeHierarchyTree.setTypeHierarchy(new Location(location, window.activeTextEditor.selection.active));
 				} else {
 					if (window.activeTextEditor?.document?.languageId !== "java") {
 						return;
 					}
-					typeHierarchyTree.setTypeHierarchy(new Location(window.activeTextEditor.document.uri, window.activeTextEditor.selection.active), TypeHierarchyDirection.Both);
+					typeHierarchyTree.setTypeHierarchy(new Location(window.activeTextEditor.document.uri, window.activeTextEditor.selection.active));
 				}
 			}));
 
+			context.subscriptions.push(commands.registerCommand("java.supertypes", async (item: TypeHierarchyItemCode, token?: CancellationToken) => {
+				const itemLsp = ToTypeHierarchyItemLSP(this.languageClient, item);
+				const params: TypeHierarchySupertypesParams = {
+					item: itemLsp
+				};
+				const itemsLsp = await this.languageClient.sendRequest(TypeHierarchySupertypes.type, params, token);
+				let itemsCode = itemsLsp.map(item => ToTypeHierarchyItemCode(this.languageClient, item));
+				itemsCode = itemsCode.sort((a, b) => {
+					return (a.kind.toString() === b.kind.toString()) ? a.name.localeCompare(b.name) : b.kind.toString().localeCompare(a.kind.toString());
+				});
+				return itemsCode;
+			}));
+
+			context.subscriptions.push(commands.registerCommand("java.subtypes", async (item: TypeHierarchyItemCode, token?: CancellationToken) => {
+				const itemLsp = ToTypeHierarchyItemLSP(this.languageClient, item);
+				const params: TypeHierarchySubtypesParams = {
+					item: itemLsp
+				};
+				const itemsLsp = await this.languageClient.sendRequest(TypeHierarchySubtypes.type, params, token);
+				let itemsCode = itemsLsp.map(item => ToTypeHierarchyItemCode(this.languageClient, item));
+				itemsCode = itemsCode.sort((a, b) => {
+					return (a.kind.toString() === b.kind.toString()) ? a.name.localeCompare(b.name) : b.kind.toString().localeCompare(a.kind.toString());
+				});
+				return itemsCode;
+			}));
+
 			context.subscriptions.push(commands.registerCommand(Commands.SHOW_CLASS_HIERARCHY, () => {
-				typeHierarchyTree.changeDirection(TypeHierarchyDirection.Both);
+				typeHierarchyTree.changeView(TypeHierarchyView.Class);
 			}));
 
 			context.subscriptions.push(commands.registerCommand(Commands.SHOW_SUPERTYPE_HIERARCHY, () => {
-				typeHierarchyTree.changeDirection(TypeHierarchyDirection.Parents);
+				typeHierarchyTree.changeView(TypeHierarchyView.Supertype);
 			}));
 
 			context.subscriptions.push(commands.registerCommand(Commands.SHOW_SUBTYPE_HIERARCHY, () => {
-				typeHierarchyTree.changeDirection(TypeHierarchyDirection.Children);
+				typeHierarchyTree.changeView(TypeHierarchyView.Subtype);
 			}));
 
-			context.subscriptions.push(commands.registerCommand(Commands.CHANGE_BASE_TYPE, async (item: TypeHierarchyItem) => {
+			context.subscriptions.push(commands.registerCommand(Commands.CHANGE_BASE_TYPE, async (item: TypeHierarchyItemCode) => {
 				typeHierarchyTree.changeBaseItem(item);
 			}));
 
