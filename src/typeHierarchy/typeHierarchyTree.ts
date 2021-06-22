@@ -58,7 +58,7 @@ export class TypeHierarchyTree {
 			return;
 		}
 		const symbolKind = this.client.protocol2CodeConverter.asSymbolKind(lspItem.kind);
-		const view: TypeHierarchyView = (symbolKind === vscode.SymbolKind.Interface) ? TypeHierarchyView.Subtype : TypeHierarchyView.Class;
+		const view: TypeHierarchyView = (symbolKind === vscode.SymbolKind.Interface) ? TypeHierarchyView.Supertype : TypeHierarchyView.Class;
 		const item: TypeHierarchyItemCode = ToTypeHierarchyItemCode(this.client, lspItem);
 		const input = (view === TypeHierarchyView.Class) ? new ClassHierarchyTreeInput(location, this.cancelTokenSource.token, item) : new TypeHierarchyTreeInput(location, view, this.cancelTokenSource.token, item);
 		this.location = location;
@@ -67,7 +67,10 @@ export class TypeHierarchyTree {
 		this.api.setInput(input);
 	}
 
-	public changeView(view: TypeHierarchyView): void {
+	public async changeView(view: TypeHierarchyView): Promise<void> {
+		if (!this.initialized) {
+			await this.initialize();
+		}
 		if (!this.api) {
 			return;
 		}
@@ -81,19 +84,9 @@ export class TypeHierarchyTree {
 	}
 
 	public async changeBaseItem(item: TypeHierarchyItemCode): Promise<void> {
-		if (!this.api) {
-			return;
-		}
-		if (this.cancelTokenSource) {
-			this.cancelTokenSource.cancel();
-		}
-		this.cancelTokenSource = new vscode.CancellationTokenSource();
 		const location: vscode.Location = new vscode.Location(vscode.Uri.parse(item.uri), item.selectionRange);
-		const newLocation: vscode.Location = (await this.isValidRequestPosition(location.uri, location.range.start)) ? location : this.location;
-		const input = (this.view === TypeHierarchyView.Class) ? new ClassHierarchyTreeInput(newLocation, this.cancelTokenSource.token, item) : new TypeHierarchyTreeInput(newLocation, this.view, this.cancelTokenSource.token, item);
-		this.location = newLocation;
-		this.baseItem = item;
-		this.api.setInput(input);
+		const fixedLocation: vscode.Location = (await this.isValidRequestPosition(location.uri, location.range.start)) ? location : this.location;
+		this.setTypeHierarchy(fixedLocation);
 	}
 
 	private async isValidRequestPosition(uri: vscode.Uri, position: vscode.Position) {

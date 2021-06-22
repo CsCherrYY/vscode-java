@@ -1,13 +1,13 @@
 'use strict';
 
-import { ExtensionContext, window, workspace, commands, Uri, ProgressLocation, ViewColumn, EventEmitter, extensions, Location, languages, CodeActionKind, TextEditor, CancellationToken } from "vscode";
+import { ExtensionContext, window, workspace, commands, Uri, ProgressLocation, ViewColumn, EventEmitter, extensions, Location, languages, CodeActionKind, TextEditor, CancellationToken, Position } from "vscode";
 import { Commands } from "./commands";
 import { serverStatus, ServerStatusKind } from "./serverStatus";
 import { prepareExecutable, awaitServerConnection } from "./javaServerStarter";
 import { getJavaConfig, applyWorkspaceEdit } from "./extension";
-import { LanguageClientOptions, Position as LSPosition, Location as LSLocation, MessageType, TextDocumentPositionParams, ConfigurationRequest, ConfigurationParams } from "vscode-languageclient";
+import { LanguageClientOptions, Position as LSPosition, Location as LSLocation, MessageType, TextDocumentPositionParams, ConfigurationRequest, ConfigurationParams, VersionedTextDocumentIdentifier, TextDocumentIdentifier } from "vscode-languageclient";
 import { LanguageClient, StreamInfo } from "vscode-languageclient/node";
-import { CompileWorkspaceRequest, CompileWorkspaceStatus, SourceAttachmentRequest, SourceAttachmentResult, SourceAttachmentAttribute, ProjectConfigurationUpdateRequest, FeatureStatus, StatusNotification, ProgressReportNotification, ActionableNotification, ExecuteClientCommandRequest, ServerNotification, EventNotification, EventType, LinkLocation, FindLinks, TypeHierarchyItemCode, TypeHierarchySubtypesParams, TypeHierarchySubtypes, TypeHierarchySupertypesParams, TypeHierarchySupertypes, TypeHierarchyView } from "./protocol";
+import { CompileWorkspaceRequest, CompileWorkspaceStatus, SourceAttachmentRequest, SourceAttachmentResult, SourceAttachmentAttribute, ProjectConfigurationUpdateRequest, FeatureStatus, StatusNotification, ProgressReportNotification, ActionableNotification, ExecuteClientCommandRequest, ServerNotification, EventNotification, EventType, LinkLocation, FindLinks, TypeHierarchyItemCode, TypeHierarchySubtypesParams, TypeHierarchySubtypes, TypeHierarchySupertypesParams, TypeHierarchySupertypes, TypeHierarchyView, TypeHierarchyPrepareParams, PrepareTypeHierarchy } from "./protocol";
 import { setGradleWrapperChecksum, excludeProjectSettingsFiles, ServerMode } from "./settings";
 import { onExtensionChange, collectBuildFilePattern } from "./plugin";
 import { serverTaskPresenter } from "./serverTaskPresenter";
@@ -300,6 +300,17 @@ export class StandardLanguageClient {
 				}
 			}));
 
+			context.subscriptions.push(commands.registerCommand("java.prepareTypeHierarchy", async (uri: Uri, position: Position) => {
+				const textDocument: TextDocumentIdentifier = TextDocumentIdentifier.create(uri.toString());
+				const params: TypeHierarchyPrepareParams = {
+					textDocument: textDocument,
+					position: position,
+				};
+				const prepareResults = await this.languageClient.sendRequest(PrepareTypeHierarchy.type, params);
+				const prepareResultsCode = prepareResults.map(item => ToTypeHierarchyItemCode(this.languageClient, item));
+				return prepareResultsCode;
+			}));
+
 			context.subscriptions.push(commands.registerCommand("java.supertypes", async (item: TypeHierarchyItemCode, token?: CancellationToken) => {
 				const itemLsp = ToTypeHierarchyItemLSP(this.languageClient, item);
 				const params: TypeHierarchySupertypesParams = {
@@ -515,7 +526,7 @@ function setProjectConfigurationUpdate(languageClient: LanguageClient, uri: Uri,
 }
 
 function decodeBase64(text: string): string {
-    return Buffer.from(text, 'base64').toString('ascii');
+	return Buffer.from(text, 'base64').toString('ascii');
 }
 
 export function showNoLocationFound(message: string): void {

@@ -140,9 +140,6 @@ class TypeHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHiera
 			return [this.model.getRootItem()];
 		}
 		if (this.model.getView() === TypeHierarchyView.Subtype) {
-			if (TypeHierarchyTreeDataProvider.isWhiteListType(element)) {
-				return [TypeHierarchyTreeDataProvider.getFakeItem(element)];
-			}
 			const subtypes = await typeHierarchyRepository.getSubtypes(element, this.token);
 			if (subtypes.length === 0) {
 				this._emitter.fire(element);
@@ -156,30 +153,6 @@ class TypeHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHiera
 			return supertypes;
 		}
 		return undefined;
-	}
-
-	private static isWhiteListType(item: TypeHierarchyItemCode): boolean {
-		if (item.name === "Object" && item.detail === "java.lang") {
-			return true;
-		}
-		return false;
-	}
-
-	private static getFakeItem(item: TypeHierarchyItemCode): TypeHierarchyItemCode {
-		let message: string;
-		if (item.name === "Object" && item.detail === "java.lang") {
-			message = "All classes are subtypes of java.lang.Object.";
-		}
-		return {
-			name: message,
-			kind: undefined,
-			detail: undefined,
-			uri: undefined,
-			range: undefined,
-			selectionRange: undefined,
-			data: undefined,
-			tags: [],
-		};
 	}
 
 	private static themeIconIds = [

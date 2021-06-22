@@ -11,7 +11,6 @@ export class ClassHierarchyTreeInput implements SymbolTreeInput<TypeHierarchyIte
 	readonly title: string = "Class Hierarchy";
 	readonly baseItem: TypeHierarchyItemCode;
 	private rootItem: TypeHierarchyItemCode;
-	private client: LanguageClient;
 
 	constructor(readonly location: vscode.Location, readonly token: vscode.CancellationToken, item: TypeHierarchyItemCode) {
 		typeHierarchyRepository.clear();
@@ -20,14 +19,11 @@ export class ClassHierarchyTreeInput implements SymbolTreeInput<TypeHierarchyIte
 	}
 
 	async resolve(): Promise<SymbolTreeModel<TypeHierarchyItemCode>> {
-		if (!this.client) {
-			this.client = await getActiveLanguageClient();
-		}
 		// workaround: await a second to make sure the success of reveal operation on baseItem, see: https://github.com/microsoft/vscode/issues/114989
 		await new Promise((resolve) => setTimeout(resolve, 1000));
-		this.rootItem = await getRootItem(this.client, this.baseItem, this.token);
+		this.rootItem = await getRootItem(this.baseItem, this.token);
 		const navigation: ClassHierarchyNavigation = new ClassHierarchyNavigation(this.rootItem, this.baseItem);
-		const provider = new ClassHierarchyTreeDataProvider(navigation, this.client, this.token);
+		const provider = new ClassHierarchyTreeDataProvider(navigation, this.token);
 		const treeModel: SymbolTreeModel<TypeHierarchyItemCode> = {
 			provider: provider,
 			message: undefined,
@@ -85,7 +81,7 @@ class ClassHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHier
 	public readonly onDidChangeTreeData: vscode.Event<TypeHierarchyItemCode> = this._emitter.event;
 	private baseTypeTraversed: boolean = false;
 
-	constructor(readonly navigation: ClassHierarchyNavigation, readonly client: LanguageClient, readonly token: vscode.CancellationToken) {
+	constructor(readonly navigation: ClassHierarchyNavigation, readonly token: vscode.CancellationToken) {
 		this._navigationListener = navigation.onDidChangeEvent(e => this._emitter.fire(undefined));
 	}
 
@@ -98,8 +94,8 @@ class ClassHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHier
 		if (!element) {
 			return undefined;
 		}
-		const treeItem: vscode.TreeItem = (element === this.navigation.getRootItem()) ? new vscode.TreeItem({ label: element.name, highlights: [[0, element.name.length]] }) : new vscode.TreeItem(element.name);
-		treeItem.contextValue = (element === this.navigation.getRootItem() || !element.uri) ? "false" : "true";
+		const treeItem: vscode.TreeItem = (element === this.navigation.getBaseItem()) ? new vscode.TreeItem({ label: element.name, highlights: [[0, element.name.length]] }) : new vscode.TreeItem(element.name);
+		treeItem.contextValue = (element === this.navigation.getBaseItem() || !element.uri) ? "false" : "true";
 		treeItem.description = element.detail;
 		treeItem.iconPath = ClassHierarchyTreeDataProvider.getThemeIcon(element.kind);
 		treeItem.command = (element.uri) ? {
@@ -130,38 +126,11 @@ class ClassHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHier
 		if (!element) {
 			return [this.navigation.getRootItem()];
 		}
-		if (!typeHierarchyRepository.isSubtypesResolved(element) && ClassHierarchyTreeDataProvider.isWhiteListType(element)) {
-			return [ClassHierarchyTreeDataProvider.getFakeItem(element)];
-		}
 		const subtypes = await typeHierarchyRepository.getSubtypes(element, this.token);
 		if (subtypes.length === 0) {
 			this._emitter.fire(element);
 		}
 		return subtypes;
-	}
-
-	private static isWhiteListType(item: TypeHierarchyItemCode): boolean {
-		if (item.name === "Object" && item.detail === "java.lang") {
-			return true;
-		}
-		return false;
-	}
-
-	private static getFakeItem(item: TypeHierarchyItemCode): TypeHierarchyItemCode {
-		let message: string;
-		if (item.name === "Object" && item.detail === "java.lang") {
-			message = "All classes are subtypes of java.lang.Object.";
-		}
-		return {
-			name: message,
-			kind: undefined,
-			detail: undefined,
-			uri: undefined,
-			range: undefined,
-			selectionRange: undefined,
-			data: undefined,
-			tags: [],
-		};
 	}
 
 	private static themeIconIds = [
@@ -178,7 +147,7 @@ class ClassHierarchyTreeDataProvider implements vscode.TreeDataProvider<TypeHier
 	}
 }
 
-async function getRootItem(client: LanguageClient, item: TypeHierarchyItemCode, token: vscode.CancellationToken): Promise<TypeHierarchyItemCode> {
+async function getRootItem(item: TypeHierarchyItemCode, token: vscode.CancellationToken): Promise<TypeHierarchyItemCode> {
 	if (!item) {
 		return undefined;
 	}
@@ -189,7 +158,7 @@ async function getRootItem(client: LanguageClient, item: TypeHierarchyItemCode, 
 	for (const supertype of supertypes) {
 		if (supertype.kind === vscode.SymbolKind.Class) {
 			typeHierarchyRepository.setSubtypes(supertype, item);
-			return getRootItem(client, supertype, token);
+			return getRootItem(supertype, token);
 		}
 	}
 	return item;
