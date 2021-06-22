@@ -29,6 +29,9 @@ export class TypeHierarchyTree {
 	}
 
 	public async setTypeHierarchy(location: vscode.Location): Promise<void> {
+		const items = await Promise.resolve(vscode.commands.executeCommand('typeHierarchy.prepare', location));
+		const supers = await Promise.resolve(vscode.commands.executeCommand('typeHierarchy.supertypes', items[0]));
+		const subs = await Promise.resolve(vscode.commands.executeCommand('typeHierarchy.subtypes', items[0]));
 		if (!this.initialized) {
 			await this.initialize();
 		}
