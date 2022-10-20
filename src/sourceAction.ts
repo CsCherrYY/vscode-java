@@ -12,6 +12,7 @@ export function registerCommands(languageClient: LanguageClient, context: Extens
     registerOverrideMethodsCommand(languageClient, context);
     registerHashCodeEqualsCommand(languageClient, context);
     registerOrganizeImportsCommand(languageClient, context);
+    registerAddMissingImportsCommand(languageClient, context);
     registerChooseImportCommand(context);
     registerGenerateToStringCommand(languageClient, context);
     registerGenerateAccessorsCommand(languageClient, context);
@@ -113,7 +114,20 @@ function registerHashCodeEqualsCommand(languageClient: LanguageClient, context: 
 
 function registerOrganizeImportsCommand(languageClient: LanguageClient, context: ExtensionContext): void {
     context.subscriptions.push(commands.registerCommand(Commands.ORGANIZE_IMPORTS, async (params: CodeActionParams) => {
-        const workspaceEdit = await languageClient.sendRequest(OrganizeImportsRequest.type, params);
+        const workspaceEdit = await languageClient.sendRequest(OrganizeImportsRequest.type, {
+            context: params,
+            restoreExistingImports: false
+        });
+        await applyWorkspaceEdit(workspaceEdit, languageClient);
+    }));
+}
+
+function registerAddMissingImportsCommand(languageClient: LanguageClient, context: ExtensionContext): void {
+    context.subscriptions.push(commands.registerCommand(Commands.ADD_MISSING_IMPORTS, async (params: CodeActionParams) => {
+        const workspaceEdit = await languageClient.sendRequest(OrganizeImportsRequest.type, {
+            context: params,
+            restoreExistingImports: true
+        });
         await applyWorkspaceEdit(workspaceEdit, languageClient);
     }));
 }

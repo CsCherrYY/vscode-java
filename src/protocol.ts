@@ -224,8 +224,13 @@ export namespace GenerateHashCodeEqualsRequest {
     export const type = new RequestType<GenerateHashCodeEqualsParams, WorkspaceEdit, void>('java/generateHashCodeEquals');
 }
 
+export interface OrganizeImportsParams {
+	context: CodeActionParams;
+	restoreExistingImports: boolean;
+}
+
 export namespace OrganizeImportsRequest {
-    export const type = new RequestType<CodeActionParams, WorkspaceEdit, void>('java/organizeImports');
+    export const type = new RequestType<OrganizeImportsParams, WorkspaceEdit, void>('java/organizeImports');
 }
 
 export interface ImportCandidate {

@@ -28,6 +28,7 @@ import { serverStatusBarProvider } from './serverStatusBarProvider';
 import { markdownPreviewProvider } from "./markdownPreviewProvider";
 import * as chokidar from 'chokidar';
 import { cleanupLombokCache } from "./lombokSupport";
+import { registerPasteEventHandlers } from './pasteEventHandler';
 
 const syntaxClient: SyntaxLanguageClient = new SyntaxLanguageClient();
 const standardClient: StandardLanguageClient = new StandardLanguageClient();
@@ -187,6 +188,8 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 	cleanJavaWorkspaceStorage();
 
 	serverStatusBarProvider.initialize();
+
+	registerPasteEventHandlers(context);
 
 	return requirements.resolveRequirements(context).catch(error => {
 		// show error

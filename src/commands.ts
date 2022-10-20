@@ -168,6 +168,10 @@ export namespace Commands {
      */
     export const ORGANIZE_IMPORTS = "java.action.organizeImports";
     /**
+     * Add missing imports.
+     */
+    export const ADD_MISSING_IMPORTS = "java.action.addMissingImports";
+    /**
      * Organize imports silently.
      */
     export const ORGANIZE_IMPORTS_SILENTLY = "java.edit.organizeImports";
