@@ -33,6 +33,7 @@ import { convertToGlob, deleteDirectory, ensureExists, getBuildFilePatterns, get
 import glob = require('glob');
 import { Telemetry } from './telemetry';
 import { getMessage } from './errorUtils';
+import { FormatterSettingsPanel } from './formatter';
 
 const syntaxClient: SyntaxLanguageClient = new SyntaxLanguageClient();
 const standardClient: StandardLanguageClient = new StandardLanguageClient();
@@ -313,7 +314,14 @@ export function activate(context: ExtensionContext): Promise<ExtensionAPI> {
 
 			context.subscriptions.push(commands.registerCommand(Commands.OPEN_LOGS, () => openLogs()));
 
-			context.subscriptions.push(commands.registerCommand(Commands.OPEN_FORMATTER, async () => openFormatter(context.extensionPath)));
+			context.subscriptions.push(commands.registerCommand(Commands.OPEN_FORMATTER, async () => {
+				FormatterSettingsPanel.render(context.extensionUri);
+			}));
+
+			context.subscriptions.push(commands.registerCommand(Commands.OPEN_FORMATTER_PROFILE, async () => {
+				openFormatter(context.extensionPath);
+			}));
+
 			context.subscriptions.push(commands.registerCommand(Commands.OPEN_FILE, async (uri: string) => {
 				const parsedUri = Uri.parse(uri);
 				await window.showTextDocument(parsedUri);

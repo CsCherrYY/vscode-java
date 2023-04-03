@@ -58,6 +58,7 @@ const configAssets = {
 	mode: 'none',
 	entry: {
 		changeSignature: './src/webview/changeSignature/index.tsx',
+		formatter: './src/webview/formatter/index.tsx',
 	},
 	module: {
 		rules: [{
@@ -68,6 +69,29 @@ const configAssets = {
 				configFile: 'tsconfig.webview.json'
 			}
 		}, {
+			test: /\.(scss)$/,
+			use: [{
+				loader: 'style-loader'
+			}, {
+				loader: 'css-loader'
+			}, {
+				loader: 'postcss-loader',
+				options: {
+					postcssOptions: {
+						plugins: [
+							[
+								"autoprefixer",
+								{
+									// Options
+								},
+							],
+						],
+					},
+				}
+			}, {
+				loader: 'sass-loader'
+			}]
+		}, {
 			test: /\.(css)$/,
 			use: [{
 				loader: 'style-loader'
@@ -75,7 +99,7 @@ const configAssets = {
 				loader: 'css-loader'
 			}]
 		}, {
-			test: /\.(ttf)$/,
+			test: /\.(woff2|ttf)$/,
 			type: 'asset/inline',
 		}]
 	},

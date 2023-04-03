@@ -1529,6 +1529,11 @@
         "category": "Java"
       },
       {
+        "command": "java.open.formatter.profile",
+        "title": "%java.open.formatter.profile%",
+        "category": "Java"
+      },
+      {
         "command": "java.clean.workspace",
         "title": "%java.clean.workspace%",
         "category": "Java"
@@ -1786,6 +1791,7 @@
     "@types/node": "^16.11.7",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
+    "@types/react-redux": "^7.1.24",
     "@types/vscode-webview": "^1.57.0",
     "@types/semver": "^7.3.8",
     "@types/sinon": "^10.0.12",
@@ -1804,8 +1810,13 @@
     "lodash.findindex": "^4.6.0",
     "lodash.template": ">=4.5.0",
     "minimist": ">=1.2.6",
+    "autoprefixer": "^10.4.12",
+    "sass": "^1.55.0",
+    "sass-loader": "^12.6.0",
+    "postcss-loader": "^6.2.1",
     "mocha": "^9.2.2",
     "request": "^2.88.2",
+    "process": "0.11.10",
     "sinon": "^14.0.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.4.2",
@@ -1814,10 +1825,15 @@
     "webpack-cli": "^4.6.0"
   },
   "dependencies": {
+    "@iconify-icons/codicon": "1.2.8",
+    "@iconify/react": "^1.1.4",
     "@vscode/codicons": "^0.0.32",
     "@vscode/webview-ui-toolkit": "1.2.2",
     "chokidar": "^3.5.3",
     "@redhat-developer/vscode-redhat-telemetry": "^0.6.1",
+    "@reduxjs/toolkit": "^1.8.6",
+    "bootstrap": "^4.6.2",
+    "highlight.js": "10.5.0",
     "expand-home-dir": "^0.0.3",
     "fmtr": "^1.1.2",
     "fs-extra": "^8.1.0",
@@ -1826,6 +1842,8 @@
     "jdk-utils": "^0.4.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-redux": "^7.2.9",
+    "react-bootstrap": "^1.6.6",
     "semver": "^7.3.5",
     "vscode-languageclient": "8.1.0",
     "winreg-utf8": "^0.1.1",

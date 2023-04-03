@@ -10,6 +10,7 @@
 	"java.workspace.compile": "Force Java Compilation",
 	"java.project.build": "Rebuild Projects",
 	"java.open.formatter.settings": "Open Java Formatter Settings",
+	"java.open.formatter.profile": "Open Java Formatter Profile",
 	"java.clean.workspace": "Clean Java Language Server Workspace",
 	"java.project.updateSourceAttachment": "Attach Source",
 	"java.project.addToSourcePath": "Add Folder to Java Source Path",

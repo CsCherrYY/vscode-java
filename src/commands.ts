@@ -120,6 +120,11 @@ export namespace Commands {
     export const OPEN_FORMATTER = 'java.open.formatter.settings';
 
     /**
+     * Open Java formatter profile
+     */
+    export const OPEN_FORMATTER_PROFILE = 'java.open.formatter.profile';
+
+    /**
      * Open a file given the URI
      */
     export const OPEN_FILE = 'java.open.file';
